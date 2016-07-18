@@ -2,5 +2,5 @@
 "use strict";
 const Obsidian = require('./app/obsidian');
 let app = new Obsidian();
-app.run();
+app.runCLI();
 //# sourceMappingURL=obsidian.js.map

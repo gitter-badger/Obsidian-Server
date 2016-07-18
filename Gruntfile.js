@@ -1,4 +1,4 @@
-module.exports = function(grunt) {
+module.exports = function (grunt) {
 
     grunt.initConfig({
         ts: {
@@ -22,17 +22,34 @@ module.exports = function(grunt) {
         },
         clean: {
             build: ['build']
+        },
+        mochaTest: {
+            test: {
+                options: {
+                    reporter: 'spec',
+                    captureFile: 'results.txt', // Optionally capture the reporter output to a file
+                    quiet: false, // Optionally suppress output to standard out (defaults to false)
+                    clearRequireCache: false // Optionally clear the require cache before running tests (defaults to false)
+                },
+                src: ['test/**/*.js']
+            }
         }
     });
 
     grunt.loadNpmTasks('grunt-ts');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-mocha-test');
 
     grunt.registerTask('build', [
         'clean:build',
         'ts',
         'concat'
+    ]);
+
+    grunt.registerTask('test', [
+        'build',
+        'mochaTest'
     ]);
 
 };

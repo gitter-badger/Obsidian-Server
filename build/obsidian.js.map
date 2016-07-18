@@ -1,1 +1,1 @@
-{"version":3,"file":"obsidian.js","sourceRoot":"","sources":["../src/obsidian.ts"],"names":[],"mappings":";AAYA,MAAO,QAAQ,WAAW,gBAAgB,CAAC,CAAC;AAC5C,IAAI,GAAG,GAAG,IAAI,QAAQ,EAAE,CAAC;AACzB,GAAG,CAAC,GAAG,EAAE,CAAC"}
+{"version":3,"file":"obsidian.js","sourceRoot":"","sources":["../src/obsidian.ts"],"names":[],"mappings":";AAYA,MAAO,QAAQ,WAAW,gBAAgB,CAAC,CAAC;AAC5C,IAAI,GAAG,GAAG,IAAI,QAAQ,EAAE,CAAC;AACzB,GAAG,CAAC,MAAM,EAAE,CAAC"}

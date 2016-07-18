@@ -34,7 +34,9 @@
     "grunt": "^1.0.1",
     "grunt-contrib-clean": "^1.0.0",
     "grunt-contrib-concat": "^1.0.0",
+    "grunt-mocha-test": "^0.12.7",
     "grunt-ts": "^5.5.1",
+    "mocha": "^2.5.3",
     "typescript": "^1.8.10"
   },
   "directories": {
@@ -49,7 +51,8 @@
     "url": "https://github.com/TENDIGI/Obsidian-Server.git"
   },
   "scripts": {
-    "prepublish": "grunt build"
+    "prepublish": "grunt build",
+    "test": "grunt test"
   },
   "version": "1.0.0"
 }

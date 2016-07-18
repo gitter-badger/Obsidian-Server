@@ -190,7 +190,7 @@ class ObsidianServer {
         });
     }
 
-    private runMode(mode: AppMode) {
+    runMode(mode: AppMode): Promise<void> {
         let self = this;
 
         Logger.hello();
@@ -225,7 +225,7 @@ class ObsidianServer {
             }
         }
 
-        promise.catch(this.catchError);
+        return promise.catch(this.catchError);
     }
 
     private catchError(error: any) {
@@ -296,7 +296,7 @@ class ObsidianServer {
         });
     }
 
-    run() {
+    runCLI() {
         this._cli.run(process.argv);
     }
 	

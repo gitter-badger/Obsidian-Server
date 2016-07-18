@@ -12,5 +12,5 @@
 
 import Obsidian = require('./app/obsidian');
 let app = new Obsidian();
-app.run();
+app.runCLI();
 

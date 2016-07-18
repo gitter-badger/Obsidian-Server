@@ -167,7 +167,7 @@ class ObsidianServer {
                 break;
             }
         }
-        promise.catch(this.catchError);
+        return promise.catch(this.catchError);
     }
     catchError(error) {
         Logger.error(error, 'An unexpected error occurred');
@@ -214,7 +214,7 @@ class ObsidianServer {
             self.teardown();
         });
     }
-    run() {
+    runCLI() {
         this._cli.run(process.argv);
     }
     static getAbsolutePath(filename) {

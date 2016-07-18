@@ -11,8 +11,9 @@
 
 import Commander = require('commander');
 import Constants = require('../config/constants');
+import Promise = require('bluebird');
 
-type Callback = () => void;
+type Callback = () => Promise<void>;
 type Options = { [id: string]: string };
 
 class CLI {
