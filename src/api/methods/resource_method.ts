@@ -10,6 +10,7 @@
 
 import _ = require('lodash');
 import Joi = require('joi');
+import Promise = require('bluebird');
 
 import Constants = require('../../config/constants');
 import Method = require('./method');

@@ -1,9 +1,9 @@
 "use strict";
 const _ = require('lodash');
-const Colors = require('colors');
-const Errno = require('errno');
-const Table = require('cli-table');
 const Moment = require('moment');
+let Colors = require('colors');
+let Errno = require('errno');
+let Table = require('cli-table');
 let _Arrow = "==> ";
 class Logger {
     constructor() {

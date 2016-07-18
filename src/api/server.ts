@@ -58,7 +58,7 @@ class Server {
 		}).required()
 	}).unknown().required();
 
-	private _connectionOptions: Hapi.ISeverConnectionOptions;
+	private _connectionOptions: Hapi.IServerConnectionOptions;
 	private _server: Hapi.Server;
 	private _authenticator: Authenticator;
 	private _methods: Array<Method> = [];

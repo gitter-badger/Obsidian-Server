@@ -9,10 +9,10 @@
  */
 
 import _ = require('lodash');
-import Colors = require('colors');
-import Errno = require('errno');
-import Table = require('cli-table');
 import Moment = require('moment');
+let Colors = require('colors');
+let Errno = require('errno');
+let Table = require('cli-table');
 
 let _Arrow = "==> ";
 

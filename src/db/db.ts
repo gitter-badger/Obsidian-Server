@@ -8,9 +8,9 @@
  * 
  */
 
-import Promise = require('bluebird');
 import Joi = require('joi');
 import _ = require('lodash');
+import Promise = require('bluebird');
 
 import Constants = require('../config/constants');
 import Logger = require('../app/logger');
@@ -18,7 +18,7 @@ import _Adapter = require('./adapters/adapter');
 import Environment = require('../config/environment');
 
 export type Adapter = _Adapter;
-export type Container = [Adapter];
+export type Container = Adapter[];
 
 let _adapters: Array<(new (name: string, config: {}) => Adapter)> = [
 	require('./adapters/postgresql'),
@@ -110,7 +110,7 @@ export function load(environment: Environment): Promise<Container> {
 				dbConfigs = config;
 			}
 
-			let promises = _.map(dbConfigs, function(options, key) {
+			let promises = _.map(dbConfigs, (options, key) => {
 				return _loadConfig(key, options);
 			});
 

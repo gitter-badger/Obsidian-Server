@@ -7,9 +7,7 @@
  * Written by Nick Lee <nick@tendigi.com>, May 2015
  * 
  */
-
-
-/// <reference path="../t_old/tsd.d.ts" />
+ 
 /// <reference path="../typings/index.d.ts" />
 
 import Obsidian = require('./app/obsidian');

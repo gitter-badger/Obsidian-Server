@@ -2,6 +2,7 @@
 const _ = require('lodash');
 const Joi = require('joi');
 const BCrypt = require('bcrypt');
+const Promise = require('bluebird');
 const MappingHelpers = require('../../helpers/mapping_helpers');
 const Module = require('../module');
 const StringHelpers = require('../../helpers/string_helpers');

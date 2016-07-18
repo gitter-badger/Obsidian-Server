@@ -11,6 +11,7 @@
 import _ = require('lodash');
 import Joi = require('joi');
 import BCrypt = require('bcrypt');
+import Promise = require('bluebird');
 
 import MappingHelpers = require('../../helpers/mapping_helpers');
 import Module = require('../module');

@@ -8,7 +8,6 @@
     "bcrypt": "registry:dt/bcrypt#0.0.0+20160316155526",
     "boom": "registry:dt/boom#0.0.0+20160317120654",
     "chance": "registry:dt/chance#0.7.3+20160317120654",
-    "colors": "registry:dt/colors#0.6.0-1+20160501135139",
     "commander": "registry:dt/commander#2.3.0+20160317120654",
     "hapi": "registry:dt/hapi#13.0.0+20160709092105",
     "joi": "registry:dt/joi#9.0.0+20160626220651",

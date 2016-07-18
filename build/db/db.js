@@ -1,7 +1,7 @@
 "use strict";
-const Promise = require('bluebird');
 const Joi = require('joi');
 const _ = require('lodash');
+const Promise = require('bluebird');
 const Constants = require('../config/constants');
 const Logger = require('../app/logger');
 let _adapters = [
@@ -67,7 +67,7 @@ function load(environment) {
                 Logger.info('Detected multi-database environment.');
                 dbConfigs = config;
             }
-            let promises = _.map(dbConfigs, function (options, key) {
+            let promises = _.map(dbConfigs, (options, key) => {
                 return _loadConfig(key, options);
             });
             Promise.all(promises).then(resolve, reject);
