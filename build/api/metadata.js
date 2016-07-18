@@ -1,23 +1,15 @@
-var Metadata = (function () {
-    function Metadata(name, version) {
+"use strict";
+class Metadata {
+    constructor(name, version) {
         this._name = name;
         this._version = version;
     }
-    Object.defineProperty(Metadata.prototype, "name", {
-        get: function () {
-            return this._name;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Metadata.prototype, "version", {
-        get: function () {
-            return this._version;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    return Metadata;
-})();
+    get name() {
+        return this._name;
+    }
+    get version() {
+        return this._version;
+    }
+}
 module.exports = Metadata;
 //# sourceMappingURL=metadata.js.map

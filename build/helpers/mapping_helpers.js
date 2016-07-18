@@ -1,14 +1,15 @@
-var _ = require('lodash');
-var Constants = require('../config/constants');
+"use strict";
+const _ = require('lodash');
+const Constants = require('../config/constants');
 function filterKeys(object, keys) {
     if (_.isArray(object)) {
-        var self_1 = this;
+        let self = this;
         return _.map(object, function (obj) {
-            return self_1.filterKeys(obj, keys);
+            return self.filterKeys(obj, keys);
         });
     }
     else if (_.isObject(object)) {
-        var result = _.omit(object, keys);
+        let result = _.omit(object, keys);
         return result;
     }
     else {
@@ -18,15 +19,15 @@ function filterKeys(object, keys) {
 exports.filterKeys = filterKeys;
 function filterQueryStringNulls(object) {
     if (_.isArray(object)) {
-        var self_2 = this;
+        let self = this;
         return _.map(object, function (obj) {
-            return self_2.filterQueryStringNulls(obj);
+            return self.filterQueryStringNulls(obj);
         });
     }
     else if (_.isObject(object)) {
-        var self_3 = this;
+        let self = this;
         return _.mapValues(object, function (obj) {
-            return self_3.filterQueryStringNulls(obj);
+            return self.filterQueryStringNulls(obj);
         });
     }
     else if (_.isString(object)) {

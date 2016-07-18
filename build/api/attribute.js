@@ -1,23 +1,24 @@
-var Joi = require('joi');
-var _ = require('lodash');
-var Attribute = (function () {
-    function Attribute(name, config) {
+"use strict";
+const Joi = require('joi');
+const _ = require('lodash');
+class Attribute {
+    constructor(name, config) {
         this._name = name;
-        var alternativeSchemas = _.map(Attribute.typeMap, function (value, key) {
+        let alternativeSchemas = _.map(Attribute.typeMap, function (value, key) {
             return Attribute.typeSchema(key);
         });
-        var schema = Joi.alternatives(alternativeSchemas);
-        var validationResult = Joi.validate(config, schema);
+        let schema = Joi.alternatives(alternativeSchemas);
+        let validationResult = Joi.validate(config, schema);
         if (validationResult.error) {
             throw validationResult.error;
         }
-        var validatedObject = validationResult.value;
+        let validatedObject = validationResult.value;
         this._type = validatedObject['type'];
         this._defaultValue = validatedObject['default'];
         this._index = validatedObject['index'];
         this._unique = validatedObject['unique'];
     }
-    Attribute.typeSchema = function (type) {
+    static typeSchema(type) {
         return Joi.object({
             'type': Joi.string().valid(type).required(),
             'default': Joi.alternatives([
@@ -27,65 +28,40 @@ var Attribute = (function () {
             'index': Joi.boolean().valid(true).optional(),
             'unique': Joi.boolean().valid(true).optional()
         });
-    };
+    }
     ;
-    Object.defineProperty(Attribute.prototype, "name", {
-        get: function () {
-            return this._name;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Attribute.prototype, "type", {
-        get: function () {
-            return this._type;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Attribute.prototype, "index", {
-        get: function () {
-            return this._index;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Attribute.prototype, "unique", {
-        get: function () {
-            return this._unique;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Attribute.prototype, "defaultValue", {
-        get: function () {
-            return this._defaultValue;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Attribute.prototype, "dbType", {
-        get: function () {
-            return Attribute.dbTypeMap[this.type];
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Attribute.typeMap = {
-        'integer': Joi.number().integer(),
-        'float': Joi.number(),
-        'string': Joi.string(),
-        'boolean': Joi.boolean(),
-        'date': Joi.date()
-    };
-    Attribute.dbTypeMap = {
-        'integer': 'integer',
-        'float': 'float',
-        'string': 'string',
-        'boolean': 'boolean',
-        'date': 'datetime'
-    };
-    return Attribute;
-})();
+    get name() {
+        return this._name;
+    }
+    get type() {
+        return this._type;
+    }
+    get index() {
+        return this._index;
+    }
+    get unique() {
+        return this._unique;
+    }
+    get defaultValue() {
+        return this._defaultValue;
+    }
+    get dbType() {
+        return Attribute.dbTypeMap[this.type];
+    }
+}
+Attribute.typeMap = {
+    'integer': Joi.number().integer(),
+    'float': Joi.number(),
+    'string': Joi.string(),
+    'boolean': Joi.boolean(),
+    'date': Joi.date()
+};
+Attribute.dbTypeMap = {
+    'integer': 'integer',
+    'float': 'float',
+    'string': 'string',
+    'boolean': 'boolean',
+    'date': 'datetime'
+};
 module.exports = Attribute;
 //# sourceMappingURL=attribute.js.map

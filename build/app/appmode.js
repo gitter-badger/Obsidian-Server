@@ -1,3 +1,4 @@
+"use strict";
 var AppMode;
 (function (AppMode) {
     AppMode[AppMode["Server"] = 0] = "Server";

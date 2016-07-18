@@ -1,11 +1,12 @@
-var _ = require('lodash');
-var Promise = require('bluebird');
+"use strict";
+const _ = require('lodash');
+const Promise = require('bluebird');
 var Waterline = require('waterline');
-var RelationshipType = require('../api/relationship_type');
-var Model = require('./model');
-var MigrationStrategy = require('./migration_strategy');
-var ORM = (function () {
-    function ORM(resources, databases, strategy) {
+const RelationshipType = require('../api/relationship_type');
+const Model = require('./model');
+const MigrationStrategy = require('./migration_strategy');
+class ORM {
+    constructor(resources, databases, strategy) {
         this._waterline = new Waterline();
         this._defaults = {
             migrate: 'safe'
@@ -25,14 +26,14 @@ var ORM = (function () {
             }
         }
         this._config = this.generateConfig(databases);
-        var models = this.generateModels(resources);
+        let models = this.generateModels(resources);
         _.each(models, function (model) {
             this._waterline.loadCollection(model);
         }, this);
     }
-    ORM.prototype.generateConfig = function (databases) {
-        var adapters = {};
-        var connections = {};
+    generateConfig(databases) {
+        let adapters = {};
+        let connections = {};
         _.each(databases, function (adapter) {
             adapters[adapter.adapterName] = adapter.adapter;
             connections[adapter.connectionName] = _.extend({ adapter: adapter.adapterName }, adapter.options);
@@ -42,11 +43,11 @@ var ORM = (function () {
             connections: connections,
             defaults: this._defaults
         };
-    };
-    ORM.prototype.generateModels = function (resources) {
-        var models = _.map(resources, function (resource) {
-            var resourceIdentity = resource.name.toLowerCase();
-            var attributes = {};
+    }
+    generateModels(resources) {
+        let models = _.map(resources, function (resource) {
+            let resourceIdentity = resource.name.toLowerCase();
+            let attributes = {};
             _.each(resource.attributes, function (attribute) {
                 attributes[attribute.name] = {
                     type: attribute.dbType,
@@ -60,8 +61,8 @@ var ORM = (function () {
                 }
             });
             _.each(resource.relationships, function (relationship) {
-                var targetResourceName = relationship.resourceName.toLowerCase();
-                var association;
+                let targetResourceName = relationship.resourceName.toLowerCase();
+                let association;
                 switch (relationship.type) {
                     case RelationshipType.HasOne: {
                         association = {
@@ -84,7 +85,7 @@ var ORM = (function () {
                 }
                 attributes[relationship.name] = association;
             });
-            var coll = Waterline.Collection.extend({
+            let coll = Waterline.Collection.extend({
                 identity: resourceIdentity,
                 connection: resource.connection,
                 attributes: attributes
@@ -92,10 +93,10 @@ var ORM = (function () {
             return coll;
         });
         return models;
-    };
-    ORM.prototype.connect = function () {
-        var self = this;
-        var promise = new Promise(function (fulfill, reject) {
+    }
+    connect() {
+        let self = this;
+        let promise = new Promise(function (fulfill, reject) {
             self._waterline.initialize(self._config, function (err, result) {
                 if (err)
                     reject(err);
@@ -108,9 +109,9 @@ var ORM = (function () {
             });
         });
         return promise;
-    };
-    ORM.prototype.disconnect = function () {
-        var self = this;
+    }
+    disconnect() {
+        let self = this;
         return new Promise(function (fulfill, reject) {
             self._waterline.teardown(function (error) {
                 if (error) {
@@ -121,19 +122,14 @@ var ORM = (function () {
                 }
             });
         });
-    };
-    Object.defineProperty(ORM.prototype, "models", {
-        get: function () {
-            return this._models;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    ORM.prototype.model = function (name) {
-        var key = name.toLowerCase();
+    }
+    get models() {
+        return this._models;
+    }
+    model(name) {
+        let key = name.toLowerCase();
         return this.models[key];
-    };
-    return ORM;
-})();
+    }
+}
 module.exports = ORM;
 //# sourceMappingURL=orm.js.map

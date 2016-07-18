@@ -1,3 +1,4 @@
+"use strict";
 var MigrationStrategy;
 (function (MigrationStrategy) {
     MigrationStrategy[MigrationStrategy["Safe"] = 0] = "Safe";

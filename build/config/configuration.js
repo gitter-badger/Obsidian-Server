@@ -1,7 +1,8 @@
-var Promise = require('bluebird');
-var FS = require('fs');
-var Configuration = (function () {
-    function Configuration(path) {
+"use strict";
+const Promise = require('bluebird');
+const FS = require('fs');
+class Configuration {
+    constructor(path) {
         this._readFile = Promise.promisify(FS.readFile);
         this._parseJSON = Promise.promisify(function (buf, cb) {
             try {
@@ -14,7 +15,7 @@ var Configuration = (function () {
         this._validateJSON = Promise.promisify(this.runValidation);
         this._path = path;
     }
-    Configuration.prototype.load = function (callback) {
+    load(callback) {
         this._readFile(this._path).then(this._parseJSON).then(this._validateJSON.bind(this)).then(function () {
             if (callback) {
                 callback(null);
@@ -24,8 +25,8 @@ var Configuration = (function () {
                 callback(error);
             }
         });
-    };
-    Configuration.prototype.runValidation = function (json, callback) {
+    }
+    runValidation(json, callback) {
         try {
             this.validate(json);
             if (callback) {
@@ -37,15 +38,14 @@ var Configuration = (function () {
                 callback(err);
             }
         }
-    };
-    Configuration.prototype.validate = function (json) {
+    }
+    validate(json) {
         this._validatedObject = json;
         return null;
-    };
-    Configuration.prototype.get = function (key) {
+    }
+    get(key) {
         return this._validatedObject[key];
-    };
-    return Configuration;
-})();
+    }
+}
 module.exports = Configuration;
 //# sourceMappingURL=configuration.js.map

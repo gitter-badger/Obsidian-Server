@@ -1,9 +1,10 @@
-var _ = require('lodash');
-var Promise = require('bluebird');
-var Chance = require('chance');
-var Prompt = require('prompt');
-var Logger = require('./logger');
-var _chance = new Chance();
+"use strict";
+const _ = require('lodash');
+const Promise = require('bluebird');
+const Chance = require('chance');
+let Prompt = require('prompt');
+const Logger = require('./logger');
+let _chance = new Chance();
 function _pick(client) {
     return _.pick(client, ['name', 'key', 'secret']);
 }
@@ -12,7 +13,7 @@ function _createClient(authenticator, name, key, secret) {
         Logger.hideLabels().info('').showLabels();
         Logger.info('Creating client...');
         authenticator.createClient(name, key, secret).then(function (client) {
-            var picked = _pick(client);
+            let picked = _pick(client);
             Logger.info('Client created successfully', picked, true);
             Logger.hideLabels().info('').showLabels();
             fulfill(undefined);
@@ -47,9 +48,9 @@ function list(authenticator) {
             Logger.info('No clients found.', null, true);
         }
         else {
-            var mapped = _.map(clients, _pick);
+            let mapped = _.map(clients, _pick);
             _.each(mapped, function (client, i) {
-                var label = 'Client ' + i;
+                let label = 'Client ' + i;
                 Logger.info('', client, true);
             });
         }
@@ -60,7 +61,7 @@ exports.list = list;
 function create(authenticator) {
     return new Promise(function (fulfill, reject) {
         _startPrompt();
-        var schema = {
+        let schema = {
             properties: {
                 name: {
                     description: 'Client Name:',
@@ -83,10 +84,10 @@ function create(authenticator) {
                 reject(err);
             }
             else {
-                var name_1 = result['name'];
-                var key = result['key'];
-                var secret = result['secret'];
-                _createClient(authenticator, name_1, key, secret).then(fulfill).catch(reject);
+                let name = result['name'];
+                let key = result['key'];
+                let secret = result['secret'];
+                _createClient(authenticator, name, key, secret).then(fulfill).catch(reject);
             }
         });
     });
@@ -95,7 +96,7 @@ exports.create = create;
 function destroy(authenticator) {
     return new Promise(function (fulfill, reject) {
         _startPrompt();
-        var schema = {
+        let schema = {
             properties: {
                 key: {
                     description: 'Client key to delete:',
@@ -108,7 +109,7 @@ function destroy(authenticator) {
                 reject(err);
             }
             else {
-                var key = result['key'];
+                let key = result['key'];
                 _deleteClient(authenticator, key).then(fulfill).catch(reject);
             }
         });

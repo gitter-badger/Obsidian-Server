@@ -1,7 +1,8 @@
-var Chance = require('chance');
-var StringHelpers = require('../../helpers/string_helpers');
-var Attribute = require('../../api/attribute');
-var _chance = new Chance();
+"use strict";
+const Chance = require('chance');
+const StringHelpers = require('../../helpers/string_helpers');
+const Attribute = require('../../api/attribute');
+let _chance = new Chance();
 function _randomToken() {
     return _chance.apple_token();
 }

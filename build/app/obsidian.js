@@ -1,22 +1,23 @@
-var _ = require('lodash');
-var Path = require('path');
-var Promise = require('bluebird');
-var Constants = require('../config/constants');
-var Logger = require('./logger');
-var CLI = require('./cli');
-var AppMode = require('./appmode');
-var Environment = require('../config/environment');
-var Resources = require('../config/resources');
-var DB = require('../db/db');
-var ORM = require('../db/orm');
-var MigrationStrategy = require('../db/migration_strategy');
-var Server = require('../api/server');
-var RoutePrinter = require('./route_printer');
-var ProjectGenerator = require('./project_generator');
-var REPL = require('./repl');
-var Authenticator = require('../api/authenticator');
-var ClientManager = require('./client_manager');
-var commands = {
+"use strict";
+const _ = require('lodash');
+const Path = require('path');
+const Promise = require('bluebird');
+const Constants = require('../config/constants');
+const Logger = require('./logger');
+const CLI = require('./cli');
+const AppMode = require('./appmode');
+const Environment = require('../config/environment');
+const Resources = require('../config/resources');
+const DB = require('../db/db');
+const ORM = require('../db/orm');
+const MigrationStrategy = require('../db/migration_strategy');
+const Server = require('../api/server');
+const RoutePrinter = require('./route_printer');
+const ProjectGenerator = require('./project_generator');
+const REPL = require('./repl');
+const Authenticator = require('../api/authenticator');
+const ClientManager = require('./client_manager');
+let commands = {
     'serve': { description: 'Start the Obsidian server', mode: AppMode.Server },
     'routes': { description: 'Print a list of exposed routes', mode: AppMode.RouteList },
     'new': { description: 'Generate a new project', mode: AppMode.NewProject },
@@ -28,29 +29,29 @@ var commands = {
     'clients:add': { description: 'Add a new authorized client', mode: AppMode.ManageClients },
     'clients:remove': { description: 'Remove an authorized client', mode: AppMode.ManageClients }
 };
-var globalOptions = {
+let globalOptions = {
     '-r, --resources [path]': 'An optional path to resources.json.  By default, Obsidian searches in the current directory.',
     '-e, --environment [path]': 'An optional path to environment.json.  By default, Obsidian searches in the current directory.'
 };
-var ObsidianServer = (function () {
-    function ObsidianServer() {
+class ObsidianServer {
+    constructor() {
         this._cli = new CLI();
         this.configureCLI();
     }
-    ObsidianServer.prototype.startServer = function () {
+    startServer() {
         Logger.info('Starting server...');
         this._server = new Server(this._environment, this._resources, this._orm, this._authenticator);
         return this._server.start();
-    };
-    ObsidianServer.prototype.printRoutes = function () {
+    }
+    printRoutes() {
         RoutePrinter.printRoutes(this._environment, this._resources, this._orm);
         return null;
-    };
-    ObsidianServer.prototype.startREPL = function () {
-        var repl = new REPL(this._orm);
+    }
+    startREPL() {
+        let repl = new REPL(this._orm);
         return repl.run();
-    };
-    ObsidianServer.prototype.manageClients = function () {
+    }
+    manageClients() {
         if (this._cli.command == 'clients') {
             return ClientManager.list(this._authenticator);
         }
@@ -60,36 +61,35 @@ var ObsidianServer = (function () {
         else if (this._cli.command == 'clients:remove') {
             return ClientManager.destroy(this._authenticator);
         }
-    };
-    ObsidianServer.prototype.loadORM = function () {
+    }
+    loadORM() {
         return this.initializeORM();
-    };
-    ObsidianServer.prototype.migrateORM = function () {
-        var command = this._cli.command;
-        var strategyMap = {
+    }
+    migrateORM() {
+        let command = this._cli.command;
+        let strategyMap = {
             'db:alter': MigrationStrategy.Alter,
             'db:create': MigrationStrategy.Create,
             'db:drop': MigrationStrategy.Drop
         };
-        var strategy = strategyMap[command];
-        var rawCommand = command.replace('db:', '');
+        let strategy = strategyMap[command];
+        let rawCommand = command.replace('db:', '');
         Logger.info('Migrating database with the `' + rawCommand + '` strategy...');
         return this.initializeORM(strategy);
-    };
-    ObsidianServer.prototype.initializeORM = function (strategy) {
-        if (strategy === void 0) { strategy = MigrationStrategy.Safe; }
-        var self = this;
+    }
+    initializeORM(strategy = MigrationStrategy.Safe) {
+        let self = this;
         return DB.load(this._environment).then(function (adapters) {
-            var orm = new ORM(self._resources.resources, adapters, strategy);
+            let orm = new ORM(self._resources.resources, adapters, strategy);
             self._orm = orm;
             self.postLoad();
             return orm.connect();
         });
-    };
-    ObsidianServer.prototype.loadResources = function (path) {
+    }
+    loadResources(path) {
         return new Promise(function (resolve, reject) {
             Logger.info('Loading resources...');
-            var resources = new Resources(path);
+            let resources = new Resources(path);
             resources.load(function (error) {
                 if (error)
                     reject(error);
@@ -97,11 +97,11 @@ var ObsidianServer = (function () {
                     resolve(resources);
             });
         });
-    };
-    ObsidianServer.prototype.loadEnvironment = function (path) {
+    }
+    loadEnvironment(path) {
         return new Promise(function (resolve, reject) {
             Logger.info('Loading environment...');
-            var environment = new Environment(path);
+            let environment = new Environment(path);
             environment.load(function (error) {
                 if (error)
                     reject(error);
@@ -109,21 +109,21 @@ var ObsidianServer = (function () {
                     resolve(environment);
             });
         });
-    };
-    ObsidianServer.prototype.preFlight = function () {
+    }
+    preFlight() {
         this._authenticator = new Authenticator();
         this._resources.addResource(this._authenticator.resource);
-    };
-    ObsidianServer.prototype.postLoad = function () {
+    }
+    postLoad() {
         this._authenticator.orm = this._orm;
-    };
-    ObsidianServer.prototype.loadConfiguration = function () {
+    }
+    loadConfiguration() {
         var self = this;
-        var paths = {
+        let paths = {
             environment: this._cli.options['environment'] || ObsidianServer.getAbsolutePath('environment.json'),
             resources: this._cli.options['resources'] || ObsidianServer.getAbsolutePath('resources.json')
         };
-        var promises = {
+        let promises = {
             environment: this.loadEnvironment(paths.environment),
             resources: this.loadResources(paths.resources)
         };
@@ -135,12 +135,12 @@ var ObsidianServer = (function () {
                 fulfill(undefined);
             }).catch(reject);
         });
-    };
-    ObsidianServer.prototype.runMode = function (mode) {
-        var self = this;
+    }
+    runMode(mode) {
+        let self = this;
         Logger.hello();
         Logger.info('Obsidian Server version', Constants.version);
-        var promise;
+        let promise;
         switch (mode) {
             case AppMode.Server: {
                 promise = this.loadConfiguration().bind(this).then(this.loadORM).then(this.startServer);
@@ -168,22 +168,21 @@ var ObsidianServer = (function () {
             }
         }
         promise.catch(this.catchError);
-    };
-    ObsidianServer.prototype.catchError = function (error) {
+    }
+    catchError(error) {
         Logger.error(error, 'An unexpected error occurred');
         console.error(error);
         this.teardown(-1);
-    };
-    ObsidianServer.prototype.teardownPromise = function () {
-        var self = this;
+    }
+    teardownPromise() {
+        let self = this;
         return new Promise(function (fulfill, reject) {
             fulfill(self.teardown());
         });
-    };
-    ObsidianServer.prototype.teardown = function (exitCode) {
-        if (exitCode === void 0) { exitCode = 0; }
-        var self = this;
-        var promises = [];
+    }
+    teardown(exitCode = 0) {
+        let self = this;
+        let promises = [];
         if (this._orm) {
             promises.push(this._orm.disconnect());
         }
@@ -196,9 +195,9 @@ var ObsidianServer = (function () {
             }
             process.exit(exitCode);
         });
-    };
-    ObsidianServer.prototype.configureCLI = function () {
-        var self = this;
+    }
+    configureCLI() {
+        let self = this;
         Logger.start();
         _.each(globalOptions, function (description, option) {
             self._cli.addOption(option, description);
@@ -207,21 +206,20 @@ var ObsidianServer = (function () {
             self._cli.addCommand(name, command.description, self.runMode.bind(self, command.mode));
         });
         this.registerInterruptHandler();
-    };
-    ObsidianServer.prototype.registerInterruptHandler = function () {
-        var self = this;
+    }
+    registerInterruptHandler() {
+        let self = this;
         process.on('SIGINT', function () {
             Logger.info('Shutting down in response to interrupt signal...', null, false, true);
             self.teardown();
         });
-    };
-    ObsidianServer.prototype.run = function () {
+    }
+    run() {
         this._cli.run(process.argv);
-    };
-    ObsidianServer.getAbsolutePath = function (filename) {
+    }
+    static getAbsolutePath(filename) {
         return Path.join(process.cwd(), filename);
-    };
-    return ObsidianServer;
-})();
+    }
+}
 module.exports = ObsidianServer;
 //# sourceMappingURL=obsidian.js.map

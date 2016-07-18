@@ -1,44 +1,45 @@
-var Hapi = require('hapi');
-var Boom = require('boom');
-var Joi = require('joi');
-var Promise = require('bluebird');
-var Path = require('path');
-var _ = require('lodash');
-var Negotiator = require('negotiator');
-var MessagePack = require('msgpack5')();
-var Constants = require('../config/constants');
-var Logger = require('../app/logger');
-var Method = require('./methods/method');
-var Request = require('./request');
-var ErrorResponse = require('./responses/error_response');
-var ResponseSerializer = require('./response_serializer');
-var MetadataMethod = require('./methods/metadata_method');
-var CreateMethod = require('./methods/create_method');
-var ReadMethod = require('./methods/read_method');
-var UpdateMethod = require('./methods/update_method');
-var DestroyMethod = require('./methods/destroy_method');
-var CustomMethod = require('./methods/custom_method');
-var SupportedContentTypes = {
+"use strict";
+const Hapi = require('hapi');
+const Boom = require('boom');
+const Joi = require('joi');
+const Promise = require('bluebird');
+const Path = require('path');
+const _ = require('lodash');
+let Negotiator = require('negotiator');
+let MessagePack = require('msgpack5')();
+const Constants = require('../config/constants');
+const Logger = require('../app/logger');
+const Method = require('./methods/method');
+const Request = require('./request');
+const ErrorResponse = require('./responses/error_response');
+const ResponseSerializer = require('./response_serializer');
+const MetadataMethod = require('./methods/metadata_method');
+const CreateMethod = require('./methods/create_method');
+const ReadMethod = require('./methods/read_method');
+const UpdateMethod = require('./methods/update_method');
+const DestroyMethod = require('./methods/destroy_method');
+const CustomMethod = require('./methods/custom_method');
+let SupportedContentTypes = {
     'application/json': Constants.ContentType.JSON,
     'application/msgpack': Constants.ContentType.MessagePack
 };
-var _defaultPort = function () {
-    var portString = process.env[Constants.EnvironmentVariables.port];
+let _defaultPort = function () {
+    let portString = process.env[Constants.EnvironmentVariables.port];
     if (portString)
         return parseInt(portString);
     else
         return Constants.DefaultPort;
 }();
-var Server = (function () {
-    function Server(environment, resources, orm, authenticator) {
+class Server {
+    constructor(environment, resources, orm, authenticator) {
         this._methods = [];
-        var validationResult = Joi.validate(environment.config, Server.validationSchema);
+        let validationResult = Joi.validate(environment.config, Server.validationSchema);
         if (validationResult.error) {
             throw validationResult.error;
         }
         this._authenticator = authenticator;
         this._customConfig = environment.custom;
-        var serverConfig = validationResult.value['server'];
+        let serverConfig = validationResult.value['server'];
         this._server = new Hapi.Server();
         this._connectionOptions = {
             host: serverConfig['host'],
@@ -47,23 +48,23 @@ var Server = (function () {
         this._server.connection(this._connectionOptions);
         this.registerEndpoints(resources, orm);
     }
-    Server.prototype.registerEndpoints = function (resources, orm) {
-        var metadataMethod = new MetadataMethod(resources.metadata);
+    registerEndpoints(resources, orm) {
+        let metadataMethod = new MetadataMethod(resources.metadata);
         this.registerMethod(metadataMethod);
         _.each(resources.resources, function (resource) {
             _.each(this.generateMethods(resource, orm), function (method) {
                 this.registerMethod(method, resource.name);
             }, this);
         }, this);
-        var catchallMethod = new Method('*', '\{p*}');
+        let catchallMethod = new Method('*', '\{p*}');
         this.registerMethod(catchallMethod);
-    };
-    Server.prototype.generateMethods = function (resource, orm) {
-        var self = this;
-        var model = orm.model(resource.name);
-        var methods = _.map(resource.methodDescriptors, function (descriptor) {
-            var type = descriptor.type;
-            var method;
+    }
+    generateMethods(resource, orm) {
+        let self = this;
+        let model = orm.model(resource.name);
+        let methods = _.map(resource.methodDescriptors, function (descriptor) {
+            let type = descriptor.type;
+            let method;
             switch (type) {
                 case Constants.MethodType.Create: {
                     method = new CreateMethod(resource, descriptor, model);
@@ -95,19 +96,18 @@ var Server = (function () {
             return method;
         });
         _.each(resource.modules, function (m) {
-            var customMethods = m.generateMethods(model, resource);
+            let customMethods = m.generateMethods(model, resource);
             methods = methods.concat(customMethods);
         });
-        var filteredMethods = _.reject(methods, function (method) {
+        let filteredMethods = _.reject(methods, function (method) {
             return !method;
         });
         return filteredMethods;
-    };
-    Server.prototype.registerMethod = function (method, basePath) {
-        if (basePath === void 0) { basePath = ''; }
-        var self = this;
-        var path = '/' + Path.join(basePath, method.name);
-        var routeConfig = {
+    }
+    registerMethod(method, basePath = '') {
+        let self = this;
+        let path = '/' + Path.join(basePath, method.name);
+        let routeConfig = {
             path: path,
             method: method.verb,
             handler: function (request, reply) {
@@ -116,28 +116,28 @@ var Server = (function () {
         };
         this._server.route(routeConfig);
         this._methods.push(method);
-    };
-    Server.prototype.handleRequest = function (method, hapiRequest, reply) {
-        var self = this;
-        var request = new Request();
-        var respond = function (response) {
+    }
+    handleRequest(method, hapiRequest, reply) {
+        let self = this;
+        let request = new Request();
+        let respond = function (response) {
             self.respond(method, request, response, hapiRequest, reply);
         };
         request.headers = hapiRequest.headers;
         this.authenticateClient(request).bind(this).then(function (authenticated) {
             if (authenticated) {
-                var params = {};
+                let params = {};
                 _.merge(params, hapiRequest.params, hapiRequest.query, hapiRequest.payload);
                 return self.validateParameters(params, method.validators());
             }
             else {
-                var error = Boom.unauthorized();
+                let error = Boom.unauthorized();
                 throw error;
             }
         }).then(function (params) {
             request.params = params;
             return method.transformRequest(request).then(function (req) {
-                var filterPromises = _.map(method.filters, function (filter) {
+                let filterPromises = _.map(method.filters, function (filter) {
                     return filter.before(req);
                 });
                 return Promise.all(filterPromises).then(function () {
@@ -154,49 +154,49 @@ var Server = (function () {
                 respond(response);
             }
         }).catch(function (error) {
-            var response = new ErrorResponse(error);
+            let response = new ErrorResponse(error);
             respond(response);
         });
-    };
-    Server.prototype.validateParameters = function (params, schemas) {
+    }
+    validateParameters(params, schemas) {
         return new Promise(function (fulfill, reject) {
-            var reduced = _.reduce(schemas, function (newSchema, result) {
+            let reduced = _.reduce(schemas, function (newSchema, result) {
                 return result.concat(newSchema);
             }, Joi.object());
-            var result = Joi.validate(params, reduced);
+            let result = Joi.validate(params, reduced);
             if (result.error)
                 reject(result.error);
             else
                 fulfill(result.value);
         });
-    };
-    Server.prototype.authenticateClient = function (request) {
+    }
+    authenticateClient(request) {
         if (this._authenticator) {
-            var clientKeyHeader = request.headers[Constants.AuthHeaders.clientKey];
-            var clientSecretHeader = request.headers[Constants.AuthHeaders.clientSecret];
+            let clientKeyHeader = request.headers[Constants.AuthHeaders.clientKey];
+            let clientSecretHeader = request.headers[Constants.AuthHeaders.clientSecret];
             return this._authenticator.authenticate(clientKeyHeader, clientSecretHeader);
         }
         else {
             return new Promise(function (fulfill, reject) { fulfill(true); });
         }
-    };
-    Server.prototype.runMethod = function (method, request) {
+    }
+    runMethod(method, request) {
         return new Promise(function (fulfill, reject) {
             method.handle(request, fulfill);
         });
-    };
+    }
     ;
-    Server.prototype.respond = function (method, request, response, hapiRequest, reply) {
-        var nodeRequest = hapiRequest.raw.req;
-        var contentNegotiator = new Negotiator(nodeRequest);
-        var availableTypes = _.keys(SupportedContentTypes);
-        var candidates = contentNegotiator.mediaTypes(availableTypes);
-        var contentTypeCandidate = candidates[0];
-        var replyContentType = SupportedContentTypes[contentTypeCandidate];
+    respond(method, request, response, hapiRequest, reply) {
+        let nodeRequest = hapiRequest.raw.req;
+        let contentNegotiator = new Negotiator(nodeRequest);
+        let availableTypes = _.keys(SupportedContentTypes);
+        let candidates = contentNegotiator.mediaTypes(availableTypes);
+        let contentTypeCandidate = candidates[0];
+        let replyContentType = SupportedContentTypes[contentTypeCandidate];
         if (replyContentType != null) {
-            var serializer = new ResponseSerializer(request, response);
-            var responseObject = serializer.serialize();
-            var responseData;
+            let serializer = new ResponseSerializer(request, response);
+            let responseObject = serializer.serialize();
+            let responseData;
             switch (replyContentType) {
                 case Constants.ContentType.JSON: {
                     responseData = responseObject;
@@ -207,22 +207,22 @@ var Server = (function () {
                     break;
                 }
             }
-            var hapiResponse = reply(responseData);
+            let hapiResponse = reply(responseData);
             hapiResponse.type(contentTypeCandidate);
             hapiResponse.code(response.statusCode);
             _.each(response.responseHeaders, function (v, k) {
                 hapiResponse.header(k, v);
             });
-            var responseString = response.statusCode + ' ' + method.verb + ' ' + hapiRequest.path + ' (' + request.id + ')';
+            let responseString = response.statusCode + ' ' + method.verb + ' ' + hapiRequest.path + ' (' + request.id + ')';
             Logger.http(responseString);
         }
         else {
-            var empty = new Buffer(0);
-            var hapiResponse = reply(empty);
+            let empty = new Buffer(0);
+            let hapiResponse = reply(empty);
             hapiResponse.code(Constants.HTTPStatusCode.NotAcceptable);
         }
-    };
-    Server.prototype.start = function () {
+    }
+    start() {
         var self = this;
         return new Promise(function (fulfill, reject) {
             self._server.start(function (err) {
@@ -234,29 +234,24 @@ var Server = (function () {
                 }
             });
         });
-    };
-    Server.prototype.stop = function () {
+    }
+    stop() {
         var self = this;
         return new Promise(function (fulfill, reject) {
             self._server.stop(null, function () {
                 fulfill(undefined);
             });
         });
-    };
-    Object.defineProperty(Server.prototype, "methods", {
-        get: function () {
-            return this._methods;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Server.validationSchema = Joi.object({
-        server: Joi.object({
-            host: Joi.alternatives([Joi.string().hostname(), Joi.string().ip({})]).required(),
-            port: Joi.number().default(_defaultPort).min(Constants.serverPorts.min).max(Constants.serverPorts.max)
-        }).required()
-    }).unknown().required();
-    return Server;
-})();
+    }
+    get methods() {
+        return this._methods;
+    }
+}
+Server.validationSchema = Joi.object({
+    server: Joi.object({
+        host: Joi.alternatives([Joi.string().hostname(), Joi.string().ip({})]).required(),
+        port: Joi.number().default(_defaultPort).min(Constants.serverPorts.min).max(Constants.serverPorts.max)
+    }).required()
+}).unknown().required();
 module.exports = Server;
 //# sourceMappingURL=server.js.map

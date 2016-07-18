@@ -53,13 +53,13 @@ class ErrorResponse extends Response {
 			boomError = Boom.wrap(error);
 		}
 
-		let payload = this.generatePayload(boomError);
+		let payload = ErrorResponse.generatePayload(boomError);
 		super(Constants.ResponseType.error, payload, boomError.output.statusCode);
 
 	} 
 	
 	// Formatting
-	private generatePayload(error: Boom.BoomError): any {
+	private static generatePayload(error: Boom.BoomError): any {
 		let payload: any = {};
 		payload.error = error.output.payload.error;
 		payload.message = error.message || error.output.payload.message;

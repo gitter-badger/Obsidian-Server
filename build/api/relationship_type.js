@@ -1,3 +1,4 @@
+"use strict";
 var RelationshipType;
 (function (RelationshipType) {
     RelationshipType[RelationshipType["HasOne"] = 0] = "HasOne";

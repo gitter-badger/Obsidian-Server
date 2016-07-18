@@ -1,25 +1,26 @@
-var _ = require('lodash');
-var Promise = require('bluebird');
-var Prompt = require('prompt');
-var PrettyJSON = require('prettyjson');
-var Logger = require('./logger');
-var REPL = (function () {
-    function REPL(orm) {
+"use strict";
+const _ = require('lodash');
+const Promise = require('bluebird');
+let Prompt = require('prompt');
+let PrettyJSON = require('prettyjson');
+const Logger = require('./logger');
+class REPL {
+    constructor(orm) {
         this._orm = orm;
         this._context = this._orm.models;
     }
-    REPL.prototype.startPrompt = function () {
+    startPrompt() {
         if (!Prompt.started) {
             Prompt.message = '';
             Prompt.delimiter = '';
             Prompt.start();
         }
-    };
-    REPL.prototype.getCommand = function () {
-        var self = this;
+    }
+    getCommand() {
+        let self = this;
         return new Promise(function (fulfill, reject) {
             self.startPrompt();
-            var schema = _.clone(REPL.commandSchema);
+            let schema = _.clone(REPL.commandSchema);
             Prompt.get(schema, function (err, result) {
                 if (err) {
                     reject(err);
@@ -29,31 +30,31 @@ var REPL = (function () {
                 }
             });
         });
-    };
-    REPL.prototype.abstractEval = function (command) {
-        var keys = _.keys(this);
-        for (var i in keys) {
-            var key = keys[i];
-            var str = 'var ' + key + ' = this.' + key + ';';
+    }
+    abstractEval(command) {
+        let keys = _.keys(this);
+        for (let i in keys) {
+            let key = keys[i];
+            let str = 'var ' + key + ' = this.' + key + ';';
             eval(str);
         }
         return eval(command);
-    };
-    REPL.prototype.evaluateCommand = function (command) {
-        var self = this;
+    }
+    evaluateCommand(command) {
+        let self = this;
         return new Promise(function (fulfill, reject) {
             try {
-                var result = self.abstractEval.call(self._context, command);
+                let result = self.abstractEval.call(self._context, command);
                 fulfill(result);
             }
             catch (error) {
                 fulfill(error);
             }
         });
-    };
-    REPL.prototype.printResult = function (result) {
+    }
+    printResult(result) {
         if (result instanceof Promise) {
-            var promise = result;
+            let promise = result;
             return promise.then(this.printResult);
         }
         Logger.hideLabels().info('').showLabels();
@@ -62,8 +63,8 @@ var REPL = (function () {
         }
         else {
             try {
-                var jsonResult = JSON.parse(JSON.stringify(result));
-                var rendered = PrettyJSON.render(jsonResult);
+                let jsonResult = JSON.parse(JSON.stringify(result));
+                let rendered = PrettyJSON.render(jsonResult);
                 Logger.hideLabels().info(rendered).showLabels();
             }
             catch (e) {
@@ -71,27 +72,26 @@ var REPL = (function () {
             }
         }
         Logger.hideLabels().info('').showLabels();
-    };
-    REPL.prototype.runner = function () {
+    }
+    runner() {
         return this.getCommand().bind(this).then(this.evaluateCommand).then(this.printResult).then(this.runner);
-    };
-    REPL.prototype.run = function () {
+    }
+    run() {
         Logger.hideLabels().info('').showLabels();
         return this.runner().catch(function (error) {
-            var pred = error.message == 'canceled';
+            let pred = error.message == 'canceled';
             return pred;
         }, function (error) {
             Logger.hideLabels().info('').showLabels();
         });
-    };
-    REPL.commandSchema = {
-        properties: {
-            command: {
-                description: '>>'
-            }
+    }
+}
+REPL.commandSchema = {
+    properties: {
+        command: {
+            description: '>>'
         }
-    };
-    return REPL;
-})();
+    }
+};
 module.exports = REPL;
 //# sourceMappingURL=repl.js.map

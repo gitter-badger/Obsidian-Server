@@ -1,3 +1,4 @@
+"use strict";
 function prefixKey(prefix, key) {
     return prefix + '_' + key;
 }

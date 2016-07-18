@@ -1,11 +1,12 @@
-var DateHelpers = require('../helpers/date_helpers');
-var ResponseSerializer = (function () {
-    function ResponseSerializer(request, response) {
+"use strict";
+const DateHelpers = require('../helpers/date_helpers');
+class ResponseSerializer {
+    constructor(request, response) {
         this._request = request;
         this._response = response;
     }
-    ResponseSerializer.prototype.serialize = function () {
-        var response = {
+    serialize() {
+        let response = {
             _type: this._response.type,
             _requestID: this._request.id,
             _requestTimestamp: DateHelpers.format(this._request.date),
@@ -13,8 +14,7 @@ var ResponseSerializer = (function () {
             _data: this._response.responseObject
         };
         return response;
-    };
-    return ResponseSerializer;
-})();
+    }
+}
 module.exports = ResponseSerializer;
 //# sourceMappingURL=response_serializer.js.map

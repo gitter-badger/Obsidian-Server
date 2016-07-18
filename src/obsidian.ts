@@ -9,7 +9,8 @@
  */
 
 
-/// <reference path="../typings/tsd.d.ts" />
+/// <reference path="../t_old/tsd.d.ts" />
+/// <reference path="../typings/index.d.ts" />
 
 import Obsidian = require('./app/obsidian');
 let app = new Obsidian();

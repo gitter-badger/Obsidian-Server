@@ -1,42 +1,37 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var _ = require('lodash');
-var Joi = require('joi');
-var BCrypt = require('bcrypt');
-var MappingHelpers = require('../../helpers/mapping_helpers');
-var Module = require('../module');
-var StringHelpers = require('../../helpers/string_helpers');
-var MethodDescriptor = require('../../api/method_descriptor');
-var LoginMethod = require('./login_method');
-var UserAuthenticationAttributes = require('./user_authentication_attributes');
-var _attributes = [
+"use strict";
+const _ = require('lodash');
+const Joi = require('joi');
+const BCrypt = require('bcrypt');
+const MappingHelpers = require('../../helpers/mapping_helpers');
+const Module = require('../module');
+const StringHelpers = require('../../helpers/string_helpers');
+const MethodDescriptor = require('../../api/method_descriptor');
+const LoginMethod = require('./login_method');
+const UserAuthenticationAttributes = require('./user_authentication_attributes');
+let _attributes = [
     UserAuthenticationAttributes.tokenAttribute,
     UserAuthenticationAttributes.passwordAttribute
 ];
-var UserAuthentication = (function (_super) {
-    __extends(UserAuthentication, _super);
-    function UserAuthentication(options) {
-        var validationResult = Joi.validate(options, UserAuthentication.validationSchema);
+class UserAuthentication extends Module {
+    constructor(options) {
+        let validationResult = Joi.validate(options, UserAuthentication.validationSchema);
         if (validationResult.error) {
             throw validationResult.error;
         }
-        var validated = validationResult.value;
-        var attributes = _.clone(_attributes);
+        let validated = validationResult.value;
+        let attributes = _.clone(_attributes);
         if (validated['email']) {
             attributes.push(UserAuthenticationAttributes.emailAttribute);
         }
         if (validated['username']) {
             attributes.push(UserAuthenticationAttributes.usernameAttribute);
         }
-        _super.call(this, attributes);
+        super(attributes);
         this._filteredKeys = _.map(_attributes, function (attribute) {
             return attribute.name;
         });
     }
-    UserAuthentication.prototype.genSalt = function () {
+    genSalt() {
         return new Promise(function (resolve, reject) {
             BCrypt.genSalt(function (err, salt) {
                 if (err)
@@ -45,8 +40,8 @@ var UserAuthentication = (function (_super) {
                     resolve(salt);
             });
         });
-    };
-    UserAuthentication.prototype.hashPassword = function (salt, password) {
+    }
+    hashPassword(salt, password) {
         return new Promise(function (resolve, reject) {
             BCrypt.hash(password, salt, function (err, hashed) {
                 if (err)
@@ -55,32 +50,32 @@ var UserAuthentication = (function (_super) {
                     resolve(hashed);
             });
         });
-    };
-    UserAuthentication.prototype.generateHash = function (password) {
-        var self = this;
+    }
+    generateHash(password) {
+        let self = this;
         return this.genSalt().then(function (salt) {
             return self.hashPassword(salt, password);
         });
-    };
-    UserAuthentication.prototype.transformRequest = function (request) {
-        return _super.prototype.transformRequest.call(this, request).bind(this).then(this.hashAndDelete);
-    };
-    UserAuthentication.prototype.transformResponse = function (response) {
-        var self = this;
+    }
+    transformRequest(request) {
+        return super.transformRequest(request).bind(this).then(this.hashAndDelete);
+    }
+    transformResponse(response) {
+        let self = this;
         return new Promise(function (fulfill, reject) {
-            var modifiedResponseObject = MappingHelpers.filterKeys(response.responseObject, self._filteredKeys);
+            let modifiedResponseObject = MappingHelpers.filterKeys(response.responseObject, self._filteredKeys);
             response.responseObject = modifiedResponseObject;
             fulfill(response);
         });
-    };
-    UserAuthentication.prototype.hashAndDelete = function (request) {
-        var self = this;
+    }
+    hashAndDelete(request) {
+        let self = this;
         return new Promise(function (fulfill, reject) {
-            var params = request.params;
-            var record = request.params['record'];
+            let params = request.params;
+            let record = request.params['record'];
             if (record) {
                 delete record[UserAuthenticationAttributes.tokenAttribute.name];
-                var inputPassword = record[UserAuthenticationAttributes.passwordAttribute.name];
+                let inputPassword = record[UserAuthenticationAttributes.passwordAttribute.name];
                 if (inputPassword) {
                     self.generateHash(inputPassword).then(function (hashed) {
                         record[UserAuthenticationAttributes.passwordAttribute.name] = hashed;
@@ -100,21 +95,20 @@ var UserAuthentication = (function (_super) {
                 fulfill(request);
             }
         });
-    };
-    UserAuthentication.prototype.generateMethods = function (model, resource) {
-        var methods = [];
-        var loginMethodName = StringHelpers.prefixKey(UserAuthenticationAttributes.moduleName, 'login');
-        var loginMethodDescriptor = new MethodDescriptor(loginMethodName, true);
-        var loginMethod = new LoginMethod(resource, loginMethodDescriptor, model);
+    }
+    generateMethods(model, resource) {
+        let methods = [];
+        let loginMethodName = StringHelpers.prefixKey(UserAuthenticationAttributes.moduleName, 'login');
+        let loginMethodDescriptor = new MethodDescriptor(loginMethodName, true);
+        let loginMethod = new LoginMethod(resource, loginMethodDescriptor, model);
         methods.push(loginMethod);
-        return _super.prototype.generateMethods.call(this, model, resource).concat(methods);
-    };
-    UserAuthentication.moduleName = UserAuthenticationAttributes.moduleName;
-    UserAuthentication.validationSchema = Joi.object({
-        email: Joi.boolean().valid(true),
-        username: Joi.boolean().valid(true)
-    }).or(['email', 'username']);
-    return UserAuthentication;
-})(Module);
+        return super.generateMethods(model, resource).concat(methods);
+    }
+}
+UserAuthentication.moduleName = UserAuthenticationAttributes.moduleName;
+UserAuthentication.validationSchema = Joi.object({
+    email: Joi.boolean().valid(true),
+    username: Joi.boolean().valid(true)
+}).or(['email', 'username']);
 module.exports = UserAuthentication;
 //# sourceMappingURL=user_authentication.js.map

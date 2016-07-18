@@ -1,3 +1,4 @@
+"use strict";
 exports.defaultDBAdapterName = 'primary';
 exports.BuiltInResource = {
     metadata: '_metadata',

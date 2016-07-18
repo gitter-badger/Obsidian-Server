@@ -1,5 +1,5 @@
-#!/usr/bin/env node
-var Obsidian = require('./app/obsidian');
-var app = new Obsidian();
+"use strict";
+const Obsidian = require('./app/obsidian');
+let app = new Obsidian();
 app.run();
 //# sourceMappingURL=obsidian.js.map

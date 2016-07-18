@@ -46,12 +46,12 @@ class UserAuthenticationFilter extends Filter {
 			throw validationResult.error;
 		}
 
+		super();
+
 		let validated = validationResult.value;
 
 		this._resourceName = validated['resource'];
 		this._matchAttribute = validated['match_attribute'];
-
-		super();
 	}
 	
 	// Filtering

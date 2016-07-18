@@ -4,34 +4,37 @@ module.exports = function(grunt) {
         ts: {
             options: {
                 module: 'commonjs',
-                target: 'es5'
+                target: 'es6'
             },
             default: {
                 src: './src/**/*.ts',
                 outDir: './build'
             }
         },
-        file_append: {
-            default_options: {
-                files: [{
-                    prepend: '#!/usr/bin/env node\r\n',
-                    input: './build/obsidian.js'
-                }]
-            }
-        },
+        // concat: {
+
+        // },
+        // file_append: {
+        //     default_options: {
+        //         files: [{
+        //             prepend: '#!/usr/bin/env node\r\n',
+        //             input: './build/obsidian.js'
+        //         }]
+        //     }
+        // },
         clean: {
             build: ['build']
         }
     });
 
     grunt.loadNpmTasks('grunt-ts');
-    grunt.loadNpmTasks('grunt-file-append');
+    grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-clean');
 
     grunt.registerTask('build', [
         'clean:build',
         'ts',
-        'file_append'
+        // 'file_append'
     ]);
 
 };

@@ -1,14 +1,15 @@
-var Commander = require('commander');
-var Constants = require('../config/constants');
-var CLI = (function () {
-    function CLI() {
+"use strict";
+const Commander = require('commander');
+const Constants = require('../config/constants');
+class CLI {
+    constructor() {
         this._parser = Commander.version(Constants.version);
     }
-    CLI.prototype.addOption = function (option, description) {
+    addOption(option, description) {
         this._parser.option(option, description);
-    };
-    CLI.prototype.addCommand = function (command, description, handler) {
-        var self = this;
+    }
+    addCommand(command, description, handler) {
+        let self = this;
         this._parser.command(command, description);
         this._parser.on(command, function () {
             if (handler) {
@@ -16,25 +17,16 @@ var CLI = (function () {
                 handler();
             }
         });
-    };
-    CLI.prototype.run = function (args) {
+    }
+    run(args) {
         this._parser.parse(args);
-    };
-    Object.defineProperty(CLI.prototype, "options", {
-        get: function () {
-            return this._parser.opts();
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(CLI.prototype, "command", {
-        get: function () {
-            return this._command;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    return CLI;
-})();
+    }
+    get options() {
+        return this._parser.opts();
+    }
+    get command() {
+        return this._command;
+    }
+}
 module.exports = CLI;
 //# sourceMappingURL=cli.js.map

@@ -1,46 +1,30 @@
-var Chance = require('chance');
-var Moment = require('moment');
-var Request = (function () {
-    function Request() {
+"use strict";
+const Chance = require('chance');
+const Moment = require('moment');
+class Request {
+    constructor() {
         this._id = Request.chance.guid();
         this._date = Moment().toDate();
     }
-    Object.defineProperty(Request.prototype, "headers", {
-        get: function () {
-            return this._headers;
-        },
-        set: function (headers) {
-            this._headers = headers;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Request.prototype, "params", {
-        get: function () {
-            return this._params;
-        },
-        set: function (params) {
-            this._params = params;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Request.prototype, "id", {
-        get: function () {
-            return this._id;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Request.prototype, "date", {
-        get: function () {
-            return this._date;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Request.chance = new Chance();
-    return Request;
-})();
+    set headers(headers) {
+        this._headers = headers;
+    }
+    get headers() {
+        return this._headers;
+    }
+    set params(params) {
+        this._params = params;
+    }
+    get params() {
+        return this._params;
+    }
+    get id() {
+        return this._id;
+    }
+    get date() {
+        return this._date;
+    }
+}
+Request.chance = new Chance();
 module.exports = Request;
 //# sourceMappingURL=request.js.map
