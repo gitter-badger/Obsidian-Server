@@ -51,7 +51,10 @@
  
  export function mapToJSON(object: any): any {
 	 if (_.isArray(object)) {
-		 return _.map(object, this.mapToJSON, this);
+		 let self = this;
+		 return _.map(object, o => {
+			 self.mapToJSON(o);
+		 });
 	 }
 	 else if (_.isFunction(object.toJSON)) {
 		 return object.toJSON();

@@ -26,7 +26,10 @@ class Resources extends Configuration {
             Logger.info('Loaded resource `' + key + '`', null, true);
             return resource;
         });
-        _.each(resources, this.addResource, this);
+        let self = this;
+        _.each(resources, resource => {
+            self.addResource(resource);
+        });
     }
     get metadata() {
         return this._metadata;

@@ -61,7 +61,10 @@ class Resources extends Configuration {
 			return resource;
 		});
 		
-		_.each(resources, this.addResource, this);
+		let self = this;
+		_.each(resources, resource => {
+			self.addResource(resource);
+		});
 	}
 
 	// Accessors

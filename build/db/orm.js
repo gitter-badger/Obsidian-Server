@@ -27,9 +27,10 @@ class ORM {
         }
         this._config = this.generateConfig(databases);
         let models = this.generateModels(resources);
+        let self = this;
         _.each(models, function (model) {
-            this._waterline.loadCollection(model);
-        }, this);
+            self._waterline.loadCollection(model);
+        });
     }
     generateConfig(databases) {
         let adapters = {};

@@ -51,11 +51,12 @@ class Server {
     registerEndpoints(resources, orm) {
         let metadataMethod = new MetadataMethod(resources.metadata);
         this.registerMethod(metadataMethod);
+        let self = this;
         _.each(resources.resources, function (resource) {
-            _.each(this.generateMethods(resource, orm), function (method) {
-                this.registerMethod(method, resource.name);
-            }, this);
-        }, this);
+            _.each(self.generateMethods(resource, orm), function (method) {
+                self.registerMethod(method, resource.name);
+            });
+        });
         let catchallMethod = new Method('*', '\{p*}');
         this.registerMethod(catchallMethod);
     }

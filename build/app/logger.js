@@ -68,9 +68,10 @@ class Logger {
         });
         let tableString = table.toString();
         let split = tableString.split('\n');
+        let self = this;
         _.each(split, function (line) {
-            this.info(line);
-        }, this);
+            self.info(line);
+        });
         return this;
     }
     hello() {
