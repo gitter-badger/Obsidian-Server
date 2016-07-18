@@ -11,17 +11,15 @@ module.exports = function(grunt) {
                 outDir: './build'
             }
         },
-        // concat: {
-
-        // },
-        // file_append: {
-        //     default_options: {
-        //         files: [{
-        //             prepend: '#!/usr/bin/env node\r\n',
-        //             input: './build/obsidian.js'
-        //         }]
-        //     }
-        // },
+        concat: {
+            basic: {
+                src: ['./build/obsidian.js'],
+                dest: './build/obsidian.js'
+            },
+            options: {
+                banner: '#!/usr/bin/env node\r\n'
+            }
+        },
         clean: {
             build: ['build']
         }
@@ -34,7 +32,7 @@ module.exports = function(grunt) {
     grunt.registerTask('build', [
         'clean:build',
         'ts',
-        // 'file_append'
+        'concat'
     ]);
 
 };
