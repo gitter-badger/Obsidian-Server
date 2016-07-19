@@ -12,6 +12,7 @@ import Joi = require('joi');
 
 import Constants = require('../../config/constants');
 import Adapter = require('./adapter');
+import Environment = require('../../config/environment');
 
 let _defaultPostgresURL = process.env[Constants.EnvironmentVariables.postgres_url];
 
@@ -28,8 +29,8 @@ class PostgreSQL extends Adapter {
 	});
 
 	// Initialization
-	constructor(connectionName: string, config: {}) {
-		super(connectionName, config);
+	constructor(environment: Environment, connectionName: string, config: {}) {
+		super(environment, connectionName, config);
 
 		let validationResult = Joi.validate(config, PostgreSQL.schema);
 		

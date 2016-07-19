@@ -1,6 +1,6 @@
 "use strict";
 class Adapter {
-    constructor(connectionName, config) {
+    constructor(environment, connectionName, config) {
         this._connectionName = connectionName;
     }
     get adapterName() {

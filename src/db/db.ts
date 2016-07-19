@@ -20,12 +20,12 @@ import Environment = require('../config/environment');
 export type Adapter = _Adapter;
 export type Container = Adapter[];
 
-let _adapters: Array<(new (name: string, config: {}) => Adapter)> = [
+let _adapters: Array<(new (environment: Environment, name: string, config: {}) => Adapter)> = [
 	require('./adapters/postgresql'),
 	require('./adapters/file')
 ];
 
-function _loadConfig(name: string, config: {}): Promise<Adapter> {
+function _loadConfig(environment: Environment, name: string, config: {}): Promise<Adapter> {
 
 	return new Promise<Adapter>(function(resolve, reject) {
 
@@ -34,7 +34,7 @@ function _loadConfig(name: string, config: {}): Promise<Adapter> {
 		let promises: Array<Promise<Adapter>> = _.map(_adapters, function(A) {
 			return new Promise<Adapter>(function(yep, nope) {
 				try {
-					let adapter = new A(name, config);
+					let adapter = new A(environment, name, config);
 					yep(adapter);
 				}
 				catch (err) {
@@ -111,7 +111,7 @@ export function load(environment: Environment): Promise<Container> {
 			}
 
 			let promises = _.map(dbConfigs, (options, key) => {
-				return _loadConfig(key, options);
+				return _loadConfig(environment, key, options);
 			});
 
 			Promise.all(promises).then(resolve, reject);

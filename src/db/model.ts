@@ -44,6 +44,7 @@ class Model {
 	}
 
 	read(criteria: {} = {}, sort: Array<string> = [], page: number = 0, limit: number = 1, include: Array<string> = []): Promise<Array<{}>> {
+		
 		let self = this;
 		
 		let finder = this._collection.find();
@@ -64,7 +65,6 @@ class Model {
 		});
 
 		let promise = new Promise<Array<{}>>(function(fulfill, reject) {
-			self.log('read', criteria);
 			finder.exec(function(err, records) {
 				if (err) reject(err);
 				else fulfill(records);

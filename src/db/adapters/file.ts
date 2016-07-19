@@ -8,10 +8,12 @@
  * 
  */
 
+import Path = require('path');
 import Joi = require('joi');
 let Untildify = require('untildify');
 
 import Adapter = require('./adapter');
+import Environment = require('../../config/environment');
 
 class File extends Adapter {
 
@@ -24,8 +26,8 @@ class File extends Adapter {
 	});
 
 	// Initialization
-	constructor(connectionName: string, config: {}) {
-		super(connectionName, config);
+	constructor(environment: Environment, connectionName: string, config: {}) {
+		super(environment, connectionName, config);
 
 		let validationResult = Joi.validate(config, File.schema);
 
@@ -35,8 +37,10 @@ class File extends Adapter {
 
 		this._adapterName = 'file';
 		this._adapter = this.shimAdapter();
-		
-		let path = Untildify(validationResult.value['options']['directory']);
+
+		let base = validationResult.value['options']['directory'];
+		let joined = Path.join(environment.directory, base);
+		let path = Untildify(joined);
 		
 		this._options = {
 			filePath: path,

@@ -11,6 +11,7 @@
 import Promise = require('bluebird');
 import FS = require('fs'); 
 import Joi = require('joi');
+import StringHelpers = require('../helpers/string_helpers');
  
 type Callback = (error?: any) => void;
 
@@ -65,6 +66,16 @@ class Configuration {
 	// Data Access
 	get(key: string): {} {
 		return this._validatedObject[key];	
+	}
+
+	// Properties
+
+	get path(): string {
+		return this._path;
+	}
+
+	get directory(): string {
+		return StringHelpers.getPath(this.path);
 	}
 
 }

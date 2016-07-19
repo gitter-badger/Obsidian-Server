@@ -59,7 +59,7 @@ class Authenticator {
 						key: key,
 						secret: secret
 					};
-
+					
 					Client.read(criteria, null, null, 1).then(function(records) {
 						fulfill(!_.isEmpty(records));
 					}).catch(reject);

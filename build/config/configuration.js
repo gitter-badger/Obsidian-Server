@@ -1,6 +1,7 @@
 "use strict";
 const Promise = require('bluebird');
 const FS = require('fs');
+const StringHelpers = require('../helpers/string_helpers');
 class Configuration {
     constructor(path) {
         this._readFile = Promise.promisify(FS.readFile);
@@ -45,6 +46,12 @@ class Configuration {
     }
     get(key) {
         return this._validatedObject[key];
+    }
+    get path() {
+        return this._path;
+    }
+    get directory() {
+        return StringHelpers.getPath(this.path);
     }
 }
 module.exports = Configuration;

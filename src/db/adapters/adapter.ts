@@ -8,6 +8,8 @@
  * 
  */
 
+import Environment = require('../../config/environment');
+
 class Adapter {
 	
 	protected _adapterName: string;
@@ -16,7 +18,7 @@ class Adapter {
 	protected _options: { [index: string]: any };
 	
 	// If a config is invalid, the overridden constructor is responsible for throwing an exception indicating the error.
-	constructor(connectionName: string, config: {}) {
+	constructor(environment: Environment, connectionName: string, config: {}) {
 		this._connectionName = connectionName;
 	}
 	

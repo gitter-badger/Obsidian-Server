@@ -37,7 +37,6 @@ class Model {
             finder.populate(key);
         });
         let promise = new Promise(function (fulfill, reject) {
-            self.log('read', criteria);
             finder.exec(function (err, records) {
                 if (err)
                     reject(err);

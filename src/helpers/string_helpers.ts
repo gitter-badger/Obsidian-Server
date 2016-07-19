@@ -15,3 +15,7 @@ export function prefixKey(prefix: string, key: string): string {
 export function startsWith(str: string, prefix: string): boolean {
     return str.indexOf(prefix) === 0;
 }
+
+export function getPath(file: string): string {
+    return file.substring(0, file.lastIndexOf("/"));
+}

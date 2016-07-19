@@ -8,13 +8,13 @@ let _adapters = [
     require('./adapters/postgresql'),
     require('./adapters/file')
 ];
-function _loadConfig(name, config) {
+function _loadConfig(environment, name, config) {
     return new Promise(function (resolve, reject) {
         Logger.info('Configuring adapter `' + name + '` with options', config);
         let promises = _.map(_adapters, function (A) {
             return new Promise(function (yep, nope) {
                 try {
-                    let adapter = new A(name, config);
+                    let adapter = new A(environment, name, config);
                     yep(adapter);
                 }
                 catch (err) {
@@ -68,7 +68,7 @@ function load(environment) {
                 dbConfigs = config;
             }
             let promises = _.map(dbConfigs, (options, key) => {
-                return _loadConfig(key, options);
+                return _loadConfig(environment, key, options);
             });
             Promise.all(promises).then(resolve, reject);
         }).catch(function (error) {

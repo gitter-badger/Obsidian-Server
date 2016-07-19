@@ -4,8 +4,8 @@ const Constants = require('../../config/constants');
 const Adapter = require('./adapter');
 let _defaultPostgresURL = process.env[Constants.EnvironmentVariables.postgres_url];
 class PostgreSQL extends Adapter {
-    constructor(connectionName, config) {
-        super(connectionName, config);
+    constructor(environment, connectionName, config) {
+        super(environment, connectionName, config);
         let validationResult = Joi.validate(config, PostgreSQL.schema);
         if (validationResult.error) {
             throw validationResult.error;
