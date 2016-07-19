@@ -32,6 +32,7 @@
   "description": "Obsidian Server is a database-agnostic server application that provides a standardized, documented interface for common client-server tasks.",
   "devDependencies": {
     "chai": "^3.5.0",
+    "fs-extra": "^0.30.0",
     "grunt": "^1.0.1",
     "grunt-contrib-clean": "^1.0.0",
     "grunt-contrib-concat": "^1.0.0",
