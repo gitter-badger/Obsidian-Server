@@ -149,7 +149,7 @@ describe('Create, Read, Update, Destroy', function () {
             .expect(422)
             .end(done);
     });
-    
+
     it('fails to update records without a criteria object set', done => {
         api
             .patch('/simpleTestResource/update')
@@ -165,7 +165,7 @@ describe('Create, Read, Update, Destroy', function () {
             .expect(422)
             .end(done);
     });
-    
+
     it('updates a property on a record successfully', done => {
         api
             .patch('/simpleTestResource/update')
@@ -177,8 +177,8 @@ describe('Create, Read, Update, Destroy', function () {
                 },
                 criteria: {
                     id: {
-                        '>' : 0
-                    }  
+                        '>': 0
+                    }
                 }
             })
             .expect('Content-Type', /json/)
@@ -205,8 +205,8 @@ describe('Create, Read, Update, Destroy', function () {
                 },
                 criteria: {
                     id: {
-                        '>' : 9999
-                    }  
+                        '>': 9999
+                    }
                 }
             })
             .expect('Content-Type', /json/)
@@ -217,6 +217,51 @@ describe('Create, Read, Update, Destroy', function () {
 
     // Destroy
 
+    it('fails to destroy records with no credentials set', done => {
+        api
+            .del('/simpleTestResource/destroy')
+            .expect('Content-Type', /json/)
+            .expect(401)
+            .expect(response)
+            .end(done);
+    });
 
+    it('fails to destroy records that don\'t exist', done => {
+        api
+            .del('/simpleTestResource/destroy')
+            .set(creds)
+            .query({
+                criteria: {
+                    id: {
+                        '>' : 99999
+                    }
+                }
+            })
+            .expect('Content-Type', /json/)
+            .expect(response)
+            .expect(404)
+            .end(done);
+    });
+
+    it('deletes all records matching a criteria', done => {
+        api
+            .del('/simpleTestResource/destroy')
+            .set(creds)
+            .query({
+                criteria: {
+                    id: {
+                        '<' : 99999
+                    }
+                }
+            })
+            .expect('Content-Type', /json/)
+            .expect(response)
+            .expect(200)
+            .expect(res => {
+                res.body.should.have.property('_type', 'simpleTestResource');
+                res.body.should.have.property('_data').that.is.an('array').and.is.not.empty;
+            })
+            .end(done);
+    });
 
 });

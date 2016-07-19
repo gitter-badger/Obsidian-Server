@@ -17,7 +17,8 @@
       "methods": {
         "create": true,
         "read": true,
-        "update": true
+        "update": true,
+        "destroy": true
       }
     }
   }
