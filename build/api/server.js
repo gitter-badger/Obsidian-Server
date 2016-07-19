@@ -239,7 +239,10 @@ class Server {
     stop() {
         var self = this;
         return new Promise(function (fulfill, reject) {
-            self._server.stop(null, function () {
+            let options = {
+                timeout: null
+            };
+            self._server.stop(options, function () {
                 fulfill(undefined);
             });
         });

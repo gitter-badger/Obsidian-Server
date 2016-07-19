@@ -196,6 +196,10 @@ class ObsidianServer {
         Logger.hello();
         Logger.info('Obsidian Server version', Constants.version);
 
+        let td = function() {
+            return this.teardownPromise();
+        };
+
         let promise: Promise<void>
 
         switch (mode) {
@@ -204,23 +208,23 @@ class ObsidianServer {
                 break;
             }
             case AppMode.RouteList: {
-                promise = this.loadConfiguration().bind(this).then(this.loadORM).then(this.printRoutes).then(this.teardownPromise);
+                promise = this.loadConfiguration().bind(this).then(this.loadORM).then(this.printRoutes).then(td);
                 break;
             }
             case AppMode.NewProject: {
-                promise = ProjectGenerator.generate().bind(this).then(this.teardownPromise);
+                promise = ProjectGenerator.generate().bind(this).then(td);
                 break;
             }
             case AppMode.REPL: {
-                promise = this.loadConfiguration().bind(this).then(this.loadORM).then(this.startREPL).then(this.teardownPromise);
+                promise = this.loadConfiguration().bind(this).then(this.loadORM).then(this.startREPL).then(td);
                 break;
             }
             case AppMode.Migrate: {
-                promise = this.loadConfiguration().bind(this).then(this.migrateORM).then(this.teardownPromise);
+                promise = this.loadConfiguration().bind(this).then(this.migrateORM).then(td);
                 break;
             }
             case AppMode.ManageClients: {
-                promise = this.loadConfiguration().bind(this).then(this.loadORM).then(this.manageClients).then(this.teardownPromise);
+                promise = this.loadConfiguration().bind(this).then(this.loadORM).then(this.manageClients).then(td);
                 break;
             }
         }
@@ -239,14 +243,14 @@ class ObsidianServer {
 	
     // Shutdown
 	
-    private teardownPromise(): Promise<void> {
+    private teardownPromise(exitCode: number = 0, quit: boolean = true): Promise<void> {
         let self = this;
         return new Promise<void>(function(fulfill, reject) {
-            fulfill(self.teardown());
+            fulfill(self.teardown(exitCode, quit));
         });
     }
 
-    private teardown(exitCode: number = 0) {
+    private teardown(exitCode: number = 0, quit: boolean = true) {
         let self = this;
         
         let promises: Array<Promise<void>> = [];
@@ -263,7 +267,9 @@ class ObsidianServer {
             if (exitCode == 0) {
                 Logger.goodbye();
             }
-            process.exit(exitCode);
+            if (quit) {
+                process.exit(exitCode);
+            }
         });
     }
 			

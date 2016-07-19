@@ -18,8 +18,12 @@ module.exports = function(env, res, cb) {
     }; 
 
     o.runMode(AppMode.Server).then(function() {
-        cb(function() {
-            o.teardown();
+        cb(function(done, testErr) {
+            o.teardownPromise(0, false).then(function() {
+                done(testErr);
+            }).catch(err => {
+                done(testErr || err);
+            });
         });
     });
 

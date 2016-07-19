@@ -29,6 +29,9 @@ node_modules
 **.baseDir.*
 .tscache
 
+# Test Results
+results.txt
+
 # Type definitions
 typings
 

@@ -1,0 +1,46 @@
+{
+  "data": {
+    "_client": [
+      {
+        "name": "API Test Client",
+        "key": "61f7370e4956f7d8026619d2ed776f8237586f9228d2c293930e01539c6fd4f8",
+        "secret": "e7721e6edc746715c9b0cbcfc060d8786053704bc75a1f1a7150c85bcb462ef3",
+        "createdAt": "2016-07-18T22:33:10.088Z",
+        "updatedAt": "2016-07-18T22:33:10.088Z",
+        "id": 1
+      }
+    ]
+  },
+  "schema": {
+    "_client": {
+      "name": {
+        "type": "string"
+      },
+      "key": {
+        "type": "string",
+        "index": true
+      },
+      "secret": {
+        "type": "string",
+        "index": true
+      },
+      "id": {
+        "type": "integer",
+        "autoIncrement": true,
+        "primaryKey": true,
+        "unique": true
+      },
+      "createdAt": {
+        "type": "datetime"
+      },
+      "updatedAt": {
+        "type": "datetime"
+      }
+    }
+  },
+  "counters": {
+    "_client": {
+      "id": 1
+    }
+  }
+}

@@ -140,6 +140,9 @@ class ObsidianServer {
         let self = this;
         Logger.hello();
         Logger.info('Obsidian Server version', Constants.version);
+        let td = function () {
+            return this.teardownPromise();
+        };
         let promise;
         switch (mode) {
             case AppMode.Server: {
@@ -147,23 +150,23 @@ class ObsidianServer {
                 break;
             }
             case AppMode.RouteList: {
-                promise = this.loadConfiguration().bind(this).then(this.loadORM).then(this.printRoutes).then(this.teardownPromise);
+                promise = this.loadConfiguration().bind(this).then(this.loadORM).then(this.printRoutes).then(td);
                 break;
             }
             case AppMode.NewProject: {
-                promise = ProjectGenerator.generate().bind(this).then(this.teardownPromise);
+                promise = ProjectGenerator.generate().bind(this).then(td);
                 break;
             }
             case AppMode.REPL: {
-                promise = this.loadConfiguration().bind(this).then(this.loadORM).then(this.startREPL).then(this.teardownPromise);
+                promise = this.loadConfiguration().bind(this).then(this.loadORM).then(this.startREPL).then(td);
                 break;
             }
             case AppMode.Migrate: {
-                promise = this.loadConfiguration().bind(this).then(this.migrateORM).then(this.teardownPromise);
+                promise = this.loadConfiguration().bind(this).then(this.migrateORM).then(td);
                 break;
             }
             case AppMode.ManageClients: {
-                promise = this.loadConfiguration().bind(this).then(this.loadORM).then(this.manageClients).then(this.teardownPromise);
+                promise = this.loadConfiguration().bind(this).then(this.loadORM).then(this.manageClients).then(td);
                 break;
             }
         }
@@ -174,13 +177,13 @@ class ObsidianServer {
         console.error(error);
         this.teardown(-1);
     }
-    teardownPromise() {
+    teardownPromise(exitCode = 0, quit = true) {
         let self = this;
         return new Promise(function (fulfill, reject) {
-            fulfill(self.teardown());
+            fulfill(self.teardown(exitCode, quit));
         });
     }
-    teardown(exitCode = 0) {
+    teardown(exitCode = 0, quit = true) {
         let self = this;
         let promises = [];
         if (this._orm) {
@@ -193,7 +196,9 @@ class ObsidianServer {
             if (exitCode == 0) {
                 Logger.goodbye();
             }
-            process.exit(exitCode);
+            if (quit) {
+                process.exit(exitCode);
+            }
         });
     }
     configureCLI() {
