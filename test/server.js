@@ -1,30 +1,23 @@
 'use strict';
 
 const should = require('chai').should();
-const supertest = require('supertest');
-const bootstrap = require('./bootstrap');
-const creds = require('./creds');
-const response = require('./response');
+const rot = require('rot');
+const _ = require('lodash');
+const setup = require('./config/setup');
+const creds = require('./config/creds');
+const response = require('./config/response');
 
 describe('Basic Server Functionality', function () {
 
-    let doneCallback;
-    let api;
-
-    before(function (done) {
-        bootstrap('envs/basic/environment.json', 'envs/basic/resources.json', teardown => {
-            doneCallback = teardown;
-            api = supertest('http://127.0.0.1:8000');
-            done();
-        });
-    });
-
-    after(function (done) {
-        doneCallback(done);
-    });
+    let api = setup(before, after);
 
     it('401 if no credentials are passed', done => {
         api.get('/').expect('Content-Type', /json/).expect(401).expect(response).end(done);
+    });
+
+    it('401 if wrong credentials are passed', done => {
+        let rottedCreds = _.mapValues(creds, v => { return rot(v); });
+        api.get('/').set(rottedCreds).expect('Content-Type', /json/).expect(401).expect(response).end(done);
     });
 
     it('404 if no path is passed', done => {

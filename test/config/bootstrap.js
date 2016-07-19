@@ -1,7 +1,7 @@
 'use strict';
 
-const Obsidian = require('../build/app/obsidian');
-const AppMode = require('../build/app/appmode');
+const Obsidian = require('../../build/app/obsidian');
+const AppMode = require('../../build/app/appmode');
 const Path = require('path');
 
 const file = __filename;
