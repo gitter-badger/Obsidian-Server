@@ -14,7 +14,6 @@ class File extends Adapter {
         this._adapter = this.shimAdapter();
         let base = validationResult.value['options']['directory'];
         let joined = Path.join(environment.directory, base);
-        console.log(joined);
         let path = Untildify(joined);
         this._options = {
             filePath: path,
