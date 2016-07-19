@@ -27,10 +27,11 @@ module.exports = (before, after) => {
 
     after(function (done) {
         doneCallback(err => {
-            fs.removeSync(tempEnv);
+            // fs.removeSync(tempEnv);
             done(err);
         });
     });
 
     return supertest('http://127.0.0.1:8000');
+    
 };

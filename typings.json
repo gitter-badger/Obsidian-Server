@@ -12,6 +12,7 @@
     "hapi": "registry:dt/hapi#13.0.0+20160709092105",
     "joi": "registry:dt/joi#9.0.0+20160626220651",
     "node": "registry:dt/node#6.0.0+20160709114037",
+    "qs": "registry:dt/qs#6.2.0+20160707010053",
     "sanitize-filename": "registry:dt/sanitize-filename#1.1.1+20160317120654"
   }
 }

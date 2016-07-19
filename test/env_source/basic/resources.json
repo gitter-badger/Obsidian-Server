@@ -3,5 +3,22 @@
     "name": "test",
     "version": "0.0.1"
   },
-  "resources": {}
+  "resources": {
+    "simpleTestResource": {
+      "attributes": {
+        "myString": {
+          "type": "string"
+        },
+        "myOtherString": {
+          "type": "string",
+          "default": "it's a default"
+        }
+      },
+      "methods": {
+        "create": true,
+        "read": true,
+        "update": true
+      }
+    }
+  }
 }

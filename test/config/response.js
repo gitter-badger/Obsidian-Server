@@ -1,11 +1,12 @@
 'use strict';
 
 const _ = require('lodash');
+const should = require('chai').should();
 
 module.exports = res => {
     const keys = ['_requestID', '_requestTimestamp', '_responseTimestamp'];
     _.each(keys, key => {
-        if (!(key in res.body)) throw new Error("missing " + key + " key");
+        res.body.should.have.property(key).that.is.a('string');
         delete res.body[key];
     });
 };

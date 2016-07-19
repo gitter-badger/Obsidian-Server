@@ -5,6 +5,8 @@ const Joi = require('joi');
 const Promise = require('bluebird');
 const Path = require('path');
 const _ = require('lodash');
+const Url = require('url');
+const Qs = require('qs');
 let Negotiator = require('negotiator');
 let MessagePack = require('msgpack5')();
 const Constants = require('../config/constants');
@@ -128,7 +130,10 @@ class Server {
         this.authenticateClient(request).bind(this).then(function (authenticated) {
             if (authenticated) {
                 let params = {};
-                _.merge(params, hapiRequest.params, hapiRequest.query, hapiRequest.payload);
+                const uri = hapiRequest.raw.req.url;
+                const parsed = Url.parse(uri, false);
+                parsed.query = Qs.parse(parsed.query);
+                _.merge(params, hapiRequest.params, parsed.query, hapiRequest.payload);
                 return self.validateParameters(params, method.validators());
             }
             else {

@@ -3,7 +3,8 @@ const Moment = require('moment');
 const Constants = require('../../config/constants');
 const MappingHelpers = require('../../helpers/mapping_helpers');
 function _decodeResponse(object) {
-    return MappingHelpers.mapToJSON(object);
+    const obj = MappingHelpers.mapToJSON(object);
+    return obj;
 }
 class Response {
     constructor(type, responseObject = null, statusCode = Constants.HTTPStatusCode.Ok) {

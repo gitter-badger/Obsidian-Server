@@ -8,7 +8,7 @@ const file = __filename;
 const wd = file.substring(0, file.lastIndexOf("/"));
 
 module.exports = function(env, res, cb) {
-    var o = new Obsidian();
+    const o = new Obsidian();
     
     o._cli = {
         options: {

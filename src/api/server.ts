@@ -14,6 +14,8 @@ import Joi = require('joi');
 import Promise = require('bluebird');
 import Path = require('path');
 import _ = require('lodash');
+import Url = require('url');
+import Qs = require('qs');
 let Negotiator = require('negotiator');
 let MessagePack = require('msgpack5')();
 
@@ -42,11 +44,11 @@ let SupportedContentTypes = {
 	'application/msgpack': Constants.ContentType.MessagePack
 };
 
-let _defaultPort = function(): number {
+let _defaultPort = function (): number {
 	let portString = process.env[Constants.EnvironmentVariables.port];
 	if (portString) return parseInt(portString);
 	else return Constants.DefaultPort;
-}();
+} ();
 
 class Server {
 
@@ -63,7 +65,7 @@ class Server {
 	private _authenticator: Authenticator;
 	private _methods: Array<Method> = [];
 	private _customConfig: {};
-	
+
 	// Initialization
 	constructor(environment: Environment, resources: Resources, orm: ORM, authenticator?: Authenticator) {
 		let validationResult = Joi.validate(environment.config, Server.validationSchema);
@@ -95,8 +97,8 @@ class Server {
 
 		let self = this;
 
-		_.each(resources.resources, function(resource) {
-			_.each(self.generateMethods(resource, orm), function(method) {
+		_.each(resources.resources, function (resource) {
+			_.each(self.generateMethods(resource, orm), function (method) {
 				self.registerMethod(method, resource.name);
 			});
 		});
@@ -110,7 +112,7 @@ class Server {
 
 		let model = orm.model(resource.name);
 
-		let methods: Array<Method> = _.map(resource.methodDescriptors, function(descriptor) {
+		let methods: Array<Method> = _.map(resource.methodDescriptors, function (descriptor) {
 
 			let type = descriptor.type;
 			let method: Method;
@@ -139,7 +141,7 @@ class Server {
 			}
 
 			if (method) {
-				_.each(descriptor.filters, function(filter) {
+				_.each(descriptor.filters, function (filter) {
 					filter.orm = orm;
 				});
 				method.filters = descriptor.filters;
@@ -149,12 +151,12 @@ class Server {
 
 		});
 
-		_.each(resource.modules, function(m) {
+		_.each(resource.modules, function (m) {
 			let customMethods = m.generateMethods(model, resource);
 			methods = methods.concat(customMethods);
 		});
 
-		let filteredMethods = _.reject(methods, function(method) {
+		let filteredMethods = _.reject(methods, function (method) {
 			return !method;
 		});
 
@@ -169,7 +171,7 @@ class Server {
 		let routeConfig: Hapi.IRouteConfiguration = {
 			path: path,
 			method: method.verb,
-			handler: function(request, reply) {
+			handler: function (request, reply) {
 				self.handleRequest(method, request, reply);
 			}
 		};
@@ -184,44 +186,50 @@ class Server {
 
 		let request = new Request();
 
-		let respond = function(response: Response) {
+		let respond = function (response: Response) {
 			self.respond(method, request, response, hapiRequest, reply);
 		};
 
 		request.headers = hapiRequest.headers;
 
-		this.authenticateClient(request).bind(this).then(function(authenticated) {
-			
+		this.authenticateClient(request).bind(this).then(function (authenticated) {
+
 			if (authenticated) {
+
 				let params: Dictionary<any> = {};
-				_.merge(params, hapiRequest.params, hapiRequest.query, hapiRequest.payload);
+				const uri = hapiRequest.raw.req.url;
+				const parsed = Url.parse(uri, false);
+				parsed.query = Qs.parse(parsed.query);
+				_.merge(params, hapiRequest.params, parsed.query, hapiRequest.payload);
+
 				return self.validateParameters(params, method.validators());
+				
 			}
 			else {
 				let error = Boom.unauthorized();
 				throw error;
 			}
 
-		}).then(function(params) {
+		}).then(function (params) {
 
 			request.params = params;
 
-			return method.transformRequest(request).then(function(req) {
-				
-				let filterPromises = _.map(method.filters, function(filter) {
+			return method.transformRequest(request).then(function (req) {
+
+				let filterPromises = _.map(method.filters, function (filter) {
 					return filter.before(req);
 				});
-				
-				return Promise.all(filterPromises).then(function() {
-					return self.runMethod(method, req);					
+
+				return Promise.all(filterPromises).then(function () {
+					return self.runMethod(method, req);
 				});
-						
+
 			});
 
-		}).then(function(response) {
+		}).then(function (response) {
 
 			if (!(response instanceof ErrorResponse)) {
-				method.transformResponse(response).then(function(res) {
+				method.transformResponse(response).then(function (res) {
 					respond(res);
 				});
 			}
@@ -229,19 +237,19 @@ class Server {
 				respond(response);
 			}
 
-		}).catch(function(error) {
-			
+		}).catch(function (error) {
+
 			let response = new ErrorResponse(error);
 			respond(response);
 
 		});
-		
+
 	}
 
 	private validateParameters(params: Dictionary<any>, schemas: Array<Joi.ObjectSchema>): Promise<Dictionary<any>> {
-		return new Promise<Dictionary<any>>(function(fulfill, reject) {
+		return new Promise<Dictionary<any>>(function (fulfill, reject) {
 
-			let reduced = _.reduce(schemas, function(newSchema, result) {
+			let reduced = _.reduce(schemas, function (newSchema, result) {
 				return result.concat(newSchema);
 			}, Joi.object());
 
@@ -260,12 +268,12 @@ class Server {
 			return this._authenticator.authenticate(clientKeyHeader, clientSecretHeader);
 		}
 		else {
-			return new Promise<boolean>(function(fulfill, reject) { fulfill(true); });
+			return new Promise<boolean>(function (fulfill, reject) { fulfill(true); });
 		}
 	}
 
 	private runMethod(method: Method, request: Request): Promise<Response> {
-		return new Promise<Response>(function(fulfill, reject) {
+		return new Promise<Response>(function (fulfill, reject) {
 			method.handle(request, fulfill);
 		});
 	};
@@ -299,11 +307,11 @@ class Server {
 			let hapiResponse = reply(responseData);
 			hapiResponse.type(contentTypeCandidate);
 			hapiResponse.code(response.statusCode);
-		
-			_.each(response.responseHeaders, function(v, k) {
+
+			_.each(response.responseHeaders, function (v, k) {
 				hapiResponse.header(k, v);
 			});
-		
+
 			// Log the response
 			let responseString = response.statusCode + ' ' + method.verb + ' ' + hapiRequest.path + ' (' + request.id + ')';
 			Logger.http(responseString);
@@ -314,12 +322,12 @@ class Server {
 			hapiResponse.code(Constants.HTTPStatusCode.NotAcceptable);
 		}
 	}
-		
+
 	// Control
 	start(): Promise<void> {
 		var self = this;
-		return new Promise<void>(function(fulfill, reject) {
-			self._server.start(function(err) {
+		return new Promise<void>(function (fulfill, reject) {
+			self._server.start(function (err) {
 				if (err) reject(err);
 				else {
 					Logger.info('Started server with options', self._connectionOptions);
@@ -331,16 +339,16 @@ class Server {
 
 	stop(): Promise<void> {
 		var self = this;
-		return new Promise<void>(function(fulfill, reject) {
+		return new Promise<void>(function (fulfill, reject) {
 			let options = {
 				timeout: null
 			};
-			self._server.stop(options, function() {
+			self._server.stop(options, function () {
 				fulfill(undefined);
 			});
 		});
 	}
-	
+
 	// Accessors
 	get methods(): Array<Method> {
 		return this._methods;

@@ -42,7 +42,7 @@ function mapToJSON(object) {
     if (_.isArray(object)) {
         let self = this;
         return _.map(object, o => {
-            self.mapToJSON(o);
+            return self.mapToJSON(o);
         });
     }
     else if (_.isFunction(object.toJSON)) {

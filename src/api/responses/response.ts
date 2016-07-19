@@ -15,7 +15,8 @@ import Constants = require('../../config/constants');
 import MappingHelpers = require('../../helpers/mapping_helpers');
 
 function _decodeResponse(object: any): any {
-	return MappingHelpers.mapToJSON(object);
+	const obj = MappingHelpers.mapToJSON(object);
+	return obj;
 }
 
 class Response {
