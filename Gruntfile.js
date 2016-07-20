@@ -1,6 +1,9 @@
-module.exports = function (grunt) {
+module.exports = function(grunt) {
 
     grunt.initConfig({
+        typings: {
+            install: {}
+        },
         ts: {
             options: {
                 module: 'commonjs',
@@ -36,6 +39,7 @@ module.exports = function (grunt) {
         }
     });
 
+    grunt.loadNpmTasks('grunt-typings');
     grunt.loadNpmTasks('grunt-ts');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-clean');
@@ -43,6 +47,7 @@ module.exports = function (grunt) {
 
     grunt.registerTask('build', [
         'clean:build',
+        'typings',
         'ts',
         'concat'
     ]);
