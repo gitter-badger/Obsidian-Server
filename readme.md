@@ -1,6 +1,6 @@
 ![Tendigi Logo](doc/assets/logo.png)
 # Obsidian Server
-
+[![Build Status](https://travis-ci.org/TENDIGI/Obsidian-Server.svg?branch=master)](https://travis-ci.org/TENDIGI/Obsidian-Server)
 ## Welcome
 Obsidian Server is a database-agnostic server application that provides a standardized, documented interface for common client-server tasks (e.g. user authentication, CRUD operations on records). 
 
