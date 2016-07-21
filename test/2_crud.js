@@ -3,9 +3,11 @@
 const _ = require('lodash');
 const chai = require('chai');
 const should = chai.should();
+chai.use(require('chai-moment'));
 const setup = require('./config/setup');
 const creds = require('./config/creds');
 const response = require('./config/response');
+const moment = require('moment');
 
 describe('Create, Read, Update, Destroy', function () {
 
@@ -40,17 +42,28 @@ describe('Create, Read, Update, Destroy', function () {
 
     it('uses supplied default values when creating new records', done => {
         api
-            .post('/simpleTestResource/create')
+            .post('/intermediateTestResource/create')
             .set(creds)
             .expect('Content-Type', /json/)
             .expect(201)
             .expect(response)
             .expect(res => {
-                res.body.should.have.property('_type', 'simpleTestResource');
+
+                res.body.should.have.property('_type', 'intermediateTestResource');
                 res.body.should.have.property('_data').that.is.an('object');
-                res.body._data.should.have.property('myString', null);
-                res.body._data.should.have.property('id');
-                res.body._data.should.have.property('myOtherString', "it's a default");
+
+                res.body._data.should.have.property('anInt', null);
+                res.body._data.should.have.property('aFloat', null);
+                res.body._data.should.have.property('aString', null);
+                res.body._data.should.have.property('aBoolean', null);
+                res.body._data.should.have.property('aDate', null);
+
+                res.body._data.should.have.property('aDefaultInt', 462);
+                res.body._data.should.have.property('aDefaultFloat', 125.56);
+                res.body._data.should.have.property('aDefaultString', 'Guy Fieri');
+                res.body._data.should.have.property('aDefaultBoolean', true);
+                res.body._data.should.have.property('aDefaultDate').sameMoment(moment('2016-07-21T17:52:18.824Z'));
+
             })
             .end(done);
     });

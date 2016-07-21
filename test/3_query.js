@@ -14,6 +14,9 @@ describe('Query Syntax', function () {
     const api = setup(before, after);
 
     before(done => {
+
+        
+
     	done();
     });
 

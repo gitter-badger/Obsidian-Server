@@ -21,7 +21,7 @@
         "destroy": true
       }
     },
-    "queryTestResource": {
+    "intermediateTestResource": {
       "attributes": {
         "anInt": {
           "type": "integer"
@@ -37,6 +37,26 @@
         },
         "aDate": {
           "type": "date"
+        },
+        "aDefaultInt": {
+          "type": "integer",
+          "default": 462
+        },
+        "aDefaultFloat": {
+          "type": "float",
+          "default": 125.56
+        },
+        "aDefaultString": {
+          "type": "string",
+          "default": "Guy Fieri"
+        },
+        "aDefaultBoolean": {
+          "type": "boolean",
+          "default": true
+        },
+        "aDefaultDate": {
+          "type": "date",
+          "default": "2016-07-21T17:52:18.824Z"
         }
       },
       "methods": {
