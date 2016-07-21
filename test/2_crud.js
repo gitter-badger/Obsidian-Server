@@ -2,9 +2,7 @@
 
 const _ = require('lodash');
 const chai = require('chai');
-chai.use(require('chai-moment'));
 const should = chai.should();
-const moment = require('moment');
 const setup = require('./config/setup');
 const creds = require('./config/creds');
 const response = require('./config/response');
@@ -35,8 +33,6 @@ describe('Create, Read, Update, Destroy', function () {
                 res.body.should.have.property('_type', 'simpleTestResource');
                 res.body.should.have.property('_data').that.is.an('object');
                 res.body._data.should.have.property('myString', null);
-                res.body._data.should.have.property('createdAt').beforeMoment(moment());
-                res.body._data.should.have.property('updatedAt').beforeMoment(moment());
                 res.body._data.should.have.property('id');
             })
             .end(done);
@@ -53,8 +49,6 @@ describe('Create, Read, Update, Destroy', function () {
                 res.body.should.have.property('_type', 'simpleTestResource');
                 res.body.should.have.property('_data').that.is.an('object');
                 res.body._data.should.have.property('myString', null);
-                res.body._data.should.have.property('createdAt').beforeMoment(moment());
-                res.body._data.should.have.property('updatedAt').beforeMoment(moment());
                 res.body._data.should.have.property('id');
                 res.body._data.should.have.property('myOtherString', "it's a default");
             })
@@ -77,8 +71,6 @@ describe('Create, Read, Update, Destroy', function () {
             .expect(res => {
                 res.body.should.have.property('_type', 'simpleTestResource');
                 res.body.should.have.property('_data').that.is.an('object');
-                res.body._data.should.have.property('createdAt').beforeMoment(moment());
-                res.body._data.should.have.property('updatedAt').beforeMoment(moment());
                 res.body._data.should.have.property('id');
                 res.body._data.should.have.property('myString', 'dooba');
                 res.body._data.should.have.property('myOtherString', 'flooba');

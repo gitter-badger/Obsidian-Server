@@ -20,6 +20,31 @@
         "update": true,
         "destroy": true
       }
+    },
+    "queryTestResource": {
+      "attributes": {
+        "anInt": {
+          "type": "integer"
+        },
+        "aFloat": {
+          "type": "float"
+        },
+        "aString": {
+          "type": "string"
+        },
+        "aBoolean": {
+          "type": "boolean"
+        },
+        "aDate": {
+          "type": "date"
+        }
+      },
+      "methods": {
+        "create": true,
+        "read": true,
+        "update": true,
+        "destroy": true
+      }
     }
   }
 }
