@@ -115,7 +115,7 @@ describe('Create, Read, Update, Destroy', function () {
             .expect(200)
             .expect(response)
             .expect(res => {
-                res.body.should.have.property('_type', 'simpleTestResource')
+                res.body.should.have.property('_type', 'simpleTestResource');
                 res.body.should.have.property('_data').that.is.an('array').and.is.empty;
             })
             .end(done);
@@ -189,11 +189,11 @@ describe('Create, Read, Update, Destroy', function () {
             .expect('Content-Type', /json/)
             .expect(response)
             .expect(res => {
-                res.body.should.have.property('_type', 'simpleTestResource')
+                res.body.should.have.property('_type', 'simpleTestResource');
                 res.body.should.have.property('_data').that.is.an('array').and.is.not.empty;
                 _.each(res.body._data, o => {
-                    o.should.have.property('myString', 'Make America')
-                    o.should.have.property('myOtherString', 'Great Again')
+                    o.should.have.property('myString', 'Make America');
+                    o.should.have.property('myOtherString', 'Great Again');
                 });
             })
             .end(done);
